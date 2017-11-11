@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using StsProject.Internal;
 using StsProject.Internal.Diagnostics;
@@ -12,7 +11,8 @@ namespace StsProject
     [DebuggerTypeProxy(typeof(EnumerableDebuggerProxy<>))]
     public partial struct GrowthArray<T> : IEnumerable<T>
     {
-        // The growth factor is 2.
+        // The growth factor, g, is 2. However, it is not declared as a constant here because the indexing
+        // algorithm cannot be adapted to any other value of g.
         private const int InitialCapacity = 8;
         private const int Log2InitialCapacity = 3;
 
@@ -23,7 +23,7 @@ namespace StsProject
         // ideal for it to make computations to calculate what the head size should be.
 
         private T[] _head;
-        private SmallDynamicArray<T[]> _tail; // This is a mutable struct field, so do not make it readonly.
+        private SmallDynamicArray<T[]> _tail; // This is a mutable struct field; do not make it readonly.
         private int _size;
         private int _hsize;
 

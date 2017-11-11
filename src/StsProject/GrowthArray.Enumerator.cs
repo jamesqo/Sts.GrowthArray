@@ -16,7 +16,7 @@ namespace StsProject
         //     ..code..
         // }
         //
-        // Under this call pattern, the following type defines an algorithm equivalent to the one
+        // Under the above call pattern, the following type defines an algorithm equivalent to the one
         // presented in Section 5.3 for growth arrays.
 
         public struct Enumerator : IEnumerator<T>

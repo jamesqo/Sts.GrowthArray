@@ -9,6 +9,8 @@ namespace StsProject
 {
     [DebuggerDisplay(DebuggerStrings.DisplayFormat)]
     [DebuggerTypeProxy(typeof(EnumerableDebuggerProxy<>))]
+    // DEVIATION FROM DynamicArray: This type is a struct instead of a class, so GrowthArray allocates
+    // less memory.
     internal partial struct SmallDynamicArray<T> : IEnumerable<T>
     {
         private const int GrowthFactor = 2;
