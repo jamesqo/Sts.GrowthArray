@@ -1,18 +1,11 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-// The implementation of this type was copied from the source of ArraySegment<T> at:
-// https://github.com/dotnet/coreclr/blob/b3e859cb5777bb68dd15caac75ee861da98489ae/src/mscorlib/src/System/ArraySegment.cs.
-
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using StsProject.Internal.Diagnostics;
 
 namespace StsProject
 {
-    public partial struct Block<T>
+    internal partial struct DynamicArray<T>
     {
         public struct Enumerator : IEnumerator<T>
         {

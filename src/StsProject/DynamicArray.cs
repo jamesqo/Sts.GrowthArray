@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using StsProject.Internal.Diagnostics;
 
-namespace StsProject.Internal
+namespace StsProject
 {
     /// <summary>
     /// A list optimized for a small number of items.
@@ -12,7 +12,7 @@ namespace StsProject.Internal
     /// <typeparam name="T">The type of the items.</typeparam>
     [DebuggerDisplay(DebuggerStrings.DisplayFormat)]
     [DebuggerTypeProxy(typeof(EnumerableDebuggerProxy<>))]
-    internal partial struct SmallList<T> : IEnumerable<T>
+    internal partial struct DynamicArray<T> : IEnumerable<T>
     {
         /// <summary>
         /// The size of this list's buffer after the first item is added.
