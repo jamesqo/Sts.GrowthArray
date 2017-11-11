@@ -18,34 +18,34 @@ namespace StsProject
             Verify.NotNull(array, nameof(array));
 
             Array = array;
-            Count = array.Length;
+            Size = array.Length;
         }
 
-        internal Buffer(T[] array, int count)
+        internal Buffer(T[] array, int size)
         {
             Verify.NotNull(array, nameof(array));
-            Verify.InRange(count >= 0 && count <= array.Length, nameof(count));
+            Verify.InRange(size >= 0 && size <= array.Length, nameof(size));
 
             Array = array;
-            Count = count;
+            Size = size;
         }
 
         public T[] Array { get; }
 
-        public int Count { get; }
+        public int Size { get; }
 
         public ref T this[int index] => ref Array[index];
 
         public void CopyTo(T[] destination, int destinationIndex)
         {
-            System.Array.Copy(Array, 0, destination, destinationIndex, Count);
+            System.Array.Copy(Array, 0, destination, destinationIndex, Size);
         }
 
         [ExcludeFromCodeCoverage]
-        private string DebuggerDisplay => $"{nameof(Count)} = {Count}";
+        private string DebuggerDisplay => $"{nameof(Size)} = {Size}";
 
         [ExcludeFromCodeCoverage]
-        IEnumerator<T> IEnumerable<T>.GetEnumerator() => Array.Take(Count).GetEnumerator();
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() => Array.Take(Size).GetEnumerator();
 
         [ExcludeFromCodeCoverage]
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<T>)this).GetEnumerator();

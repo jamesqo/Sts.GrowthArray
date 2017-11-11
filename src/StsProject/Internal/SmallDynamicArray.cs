@@ -12,7 +12,7 @@ namespace StsProject
     /// <typeparam name="T">The type of the items.</typeparam>
     [DebuggerDisplay(DebuggerStrings.DisplayFormat)]
     [DebuggerTypeProxy(typeof(EnumerableDebuggerProxy<>))]
-    internal partial struct DynamicArray<T> : IEnumerable<T>
+    internal partial struct SmallDynamicArray<T> : IEnumerable<T>
     {
         /// <summary>
         /// The size of this list's buffer after the first item is added.
@@ -52,29 +52,15 @@ namespace StsProject
         /// </summary>
         private bool IsFull => _size == Capacity;
 
-        /// <summary>
-        /// Gets or sets an item in this list.
-        /// </summary>
-        /// <param name="index">The index.</param>
-        /// <returns>The item at the specified index.</returns>
-        public T this[int index]
+        public ref T this[int index]
         {
             get
             {
                 Debug.Assert(index >= 0 && index < _size);
-                return _buf[index];
-            }
-            set
-            {
-                Debug.Assert(index >= 0 && index < _size);
-                _buf[index] = value;
+                return ref _buf[index];
             }
         }
 
-        /// <summary>
-        /// Adds an item to this list.
-        /// </summary>
-        /// <param name="item">The item to add.</param>
         public void Append(T item)
         {
             if (IsFull)

@@ -10,312 +10,148 @@ namespace StsProject
 {
     [DebuggerDisplay(DebuggerStrings.DisplayFormat)]
     [DebuggerTypeProxy(typeof(EnumerableDebuggerProxy<>))]
-    public partial class GrowthArray<T> : IList<T>, IReadOnlyList<T>
+    public partial struct GrowthArray<T> : IEnumerable<T>
     {
-        private SmallList<T[]> _tail; // This is a mutable struct field; do not make it readonly.
+        // The growth factor is 2.
+        private const int InitialCapacity = 8;
+        private const int Log2InitialCapacity = 3;
+
+        // Section 3: Fields for growth arrays
+        // DEVIATION FROM PAPER: In the paper, Cap is a field and Hsize is a property defined in terms of Cap.
+        // In this code, Hsize is a field and Capacity is a property defined in terms of Hsize.
+        // This is because Hsize is used in the appending algorithm, which is performance-sensitive. It is not
+        // ideal for it to make computations to calculate what the head size should be.
+
         private T[] _head;
-        private int _headCount;
-        private int _count;
-        private int _capacity;
-        
-        public GrowthArray()
-            : this(DefaultOptions)
+        private DynamicArray<T[]> _tail; // This is a mutable struct field, so do not make it readonly.
+        private int _size;
+        private int _hsize;
+
+        // Section 3: 'procedure Constructor(L)' for growth arrays
+
+        public static GrowthArray<T> Create()
         {
+            var growthArray = default(GrowthArray<T>);
+
+            growthArray._head = new T[InitialCapacity];
+            // DEVIATION FROM PAPER: Instead of using the type DynamicArray, which must have the same configuration
+            // (g and c_0 values) as GrowthArray for comparison purposes, I use a modified dynamic array implementation
+            // optimized for a small number of items. I do this because the size of the tail is O(log n).
+            growthArray._tail = SmallDynamicArray<T[]>.Create();
+
+            // DEVIATION FROM PAPER: The following lines are not necessary because 'growthArray' was default-initialized.
+            // This means that all numerical fields are already set to 0.
+
+            // growthArray._size = 0;
+            // growthArray._hsize = 0;
+
+            return growthArray;
         }
 
-        public GrowthArray(Options options)
-        {
-            Verify.NotNull(options, nameof(options));
+        public int Capacity => (_size - _hsize) + HeadCapacity;
 
-            _head = Array.Empty<T>();
-            _options = options;
-        }
+        public int HeadCapacity => _head.Length;
 
-        public GrowthArray(IEnumerable<T> items)
-            : this(items, DefaultOptions)
-        {
-        }
+        public bool IsFull => _size == Capacity;
 
-        public GrowthArray(IEnumerable<T> items, Options options)
-            : this(options)
-        {
-            AddRange(items);
-        }
+        public int Size => _size;
 
-        public int BlockCount => _tail.Count + 1;
-
-        public BlockView<T> Blocks => new BlockView<T>(this);
-
-        public int Capacity => _capacity;
-
-        public int Count => _count;
-
-        public bool IsContiguous => BlockCount == 1;
-
-        public bool IsEmpty => _count == 0;
-
-        public bool IsFull => _count == _capacity;
-
-        public Options Options => _options;
-
-        internal T[] Head => _head;
-
-        internal int HeadCount => _headCount;
-
-        internal Buffer<T> HeadSpan => new Buffer<T>(_head, _headCount);
-
-        internal SmallList<T[]> Tail => _tail;
-
-        [ExcludeFromCodeCoverage]
-        private string DebuggerDisplay => $"{nameof(Count)} = {Count}, {nameof(HeadCount)} = {HeadCount}, {nameof(HeadCapacity)} = {HeadCapacity}";
-
-        private int HeadCapacity => _head.Length;
-
-        public ref T this[int index]
-        {
-            get
-            {
-                Verify.InRange(index >= 0 && index < _count, nameof(index));
-
-                foreach (T[] block in _tail)
-                {
-                    if (index < block.Length)
-                    {
-                        return ref block[index];
-                    }
-                    index -= block.Length;
-                }
-
-                Debug.Assert(index < _head.Length);
-                return ref _head[index];
-            }
-        }
+        // Section 5.1: 'procedure Append(L, item)' for growth arrays
 
         public void Add(T item)
         {
             if (IsFull)
             {
-                Resize();
+                Grow();
             }
 
-            _head[_headCount++] = item;
-            _count++;
+            _head[_hsize++] = item;
+            _size++;
         }
 
-        public void AddRange(IEnumerable<T> items)
-        {
-            Verify.NotNull(items, nameof(items));
-
-            foreach (T item in items)
-            {
-                Add(item);
-            }
-        }
-
-        public ReadOnlyCollection<T> AsReadOnly() => new ReadOnlyCollection<T>(this);
-
-        public void Clear()
-        {
-            // Capture relevant state in local variables, so we can use them after Reset() wipes the fields.
-            var head = _head;
-            int headCount = _headCount;
-            var tail = _tail;
-            Reset();
-
-            Array.Clear(head, 0, headCount);
-
-            for (int i = 0; i < tail.Count; i++)
-            {
-                T[] block = tail[i];
-                tail[i] = null;
-                Array.Clear(block, 0, block.Length);
-            }
-        }
-
-        public bool Contains(T item) => IndexOf(item) != -1;
-
-        public void CopyTo(T[] array) => CopyTo(array, 0);
-
-        public void CopyTo(T[] array, int arrayIndex)
-        {
-            Verify.NotNull(array, nameof(array));
-            Verify.InRange(arrayIndex >= 0 && array.Length - arrayIndex >= _count, nameof(arrayIndex));
-
-            foreach (T[] block in _tail)
-            {
-                Array.Copy(block, 0, array, arrayIndex, block.Length);
-                arrayIndex += block.Length;
-            }
-
-            Array.Copy(_head, 0, array, arrayIndex, _headCount);
-        }
-
-        public void CopyTo(int index, T[] array, int arrayIndex, int count)
-        {
-            GetCursor(index).CopyTo(array, arrayIndex, count);
-        }
-
-        public T First()
-        {
-            Verify.ValidState(!IsEmpty, Strings.First_EmptyCollection);
-
-            return Blocks[0][0];
-        }
-
-        public Cursor GetCursor(int index) => new Cursor(this, index);
-
-        public Enumerator GetEnumerator() => new Enumerator(this);
-
-        public int IndexOf(T item)
-        {
-            int processed = 0;
-            foreach (T[] block in _tail)
-            {
-                int index = Array.IndexOf(block, item);
-                if (index != -1)
-                {
-                    return processed + index;
-                }
-                processed += block.Length;
-            }
-
-            int headIndex = Array.IndexOf(_head, item, 0, _headCount);
-            return headIndex != -1 ? processed + headIndex : -1;
-        }
-
-        public void Insert(int index, T item)
-        {
-            Verify.InRange(index >= 0 && index <= _count, nameof(index));
-
-            GetCursor(index).Insert(item);
-        }
-
-        public void InsertRange(int index, IEnumerable<T> items)
-        {
-            Verify.NotNull(items, nameof(items));
-            Verify.InRange(index >= 0 && index <= Count, nameof(index));
-
-            GetCursor(index).InsertRange(items);
-        }
-
-        public T Last()
-        {
-            Verify.ValidState(!IsEmpty, Strings.Last_EmptyCollection);
-
-            return _head[_headCount - 1];
-        }
-
-        public Buffer<T> MoveToBlock()
-        {
-            Verify.ValidState(IsContiguous, Strings.MoveToBlock_NotContiguous);
-
-            var result = HeadSpan;
-            Reset();
-            return result;
-        }
-
-        public bool Remove(T item)
-        {
-            int index = IndexOf(item);
-            if (index == -1)
-            {
-                return false;
-            }
-
-            RemoveAt(index);
-            return true;
-        }
-
-        public void RemoveAt(int index)
-        {
-            Verify.InRange(index >= 0 && index < _count, nameof(index));
-
-            GetCursor(index).Remove();
-        }
-
-        public void RemoveRange(int index, int count)
-        {
-            Verify.InRange(index >= 0, nameof(index));
-            Verify.InRange(count >= 0 && Count - index >= count, nameof(count));
-
-            GetCursor(index).RemoveRange(count);
-        }
-
-        public void Reverse() => Reverse(0, _count);
-
-        public void Reverse(int index, int count)
-        {
-            Verify.InRange(index >= 0, nameof(index));
-            Verify.InRange(count >= 0 && _count - index >= count, nameof(count));
-
-            var i = GetCursor(index);
-            var j = GetCursor(index + count - 1);
-            while (i.Position < j.Position)
-            {
-                T temp = i.Value;
-                i.Value = j.Value;
-                j.Value = temp;
-                i.Inc();
-                j.Dec();
-            }
-        }
-
-        public T[] ToArray()
-        {
-            if (IsEmpty)
-            {
-                return Array.Empty<T>();
-            }
-
-            var array = new T[_count];
-            CopyTo(array);
-            return array;
-        }
-
-        private void Reset()
-        {
-            _tail = new SmallList<T[]>();
-            _head = Array.Empty<T>();
-            _headCount = 0;
-            _count = 0;
-            _capacity = 0;
-        }
-
-        private void Resize()
+        private void Grow()
         {
             Debug.Assert(IsFull);
 
-            int initialCapacity = _options.InitialCapacity;
-            if (IsEmpty)
+            _tail.Append(_head);
+            var newHcap = HeadCapacity == InitialCapacity ?
+                (2 - 1) * InitialCapacity :
+                2 * HeadCapacity;
+            _head = new T[newHcap];
+            _size = Capacity + newHcap;
+
+            // DEVIATION FROM PAPER: I introduced an _hsize field which I must set to 0,
+            // since no items have been appended to the new head.
+            _hsize = 0;
+        }
+
+        // Section 5.2: 'function Get_item(L, index)' for growth arrays
+
+        // DEVIATION FROM PAPER: The functions are named 'ItemAt*' and return a 'ref T' instead of a 'T'.
+        // Instead of returning a value, they are returning the address of a value.
+        // This is useful because a value may be updated based on its current value, for example
+        // 'ref int value = L.ItemAt1(index); value = value + 10;', without running the calculations
+        // in ItemAt1 twice.
+
+        public ref T ItemAt1(int index)
+        {
+            Debug.Assert(index >= 0 && index < _size);
+
+            // DEVIATION FROM PAPER: For better performance, the 'Decompose' algorithm
+            // is written inline instead of in a separate function.
+            var bufferIndex = Math.Max(MathHelpers.CeilLog2(index + 1) - Log2InitialCapacity, 0);
+            var elementIndex = index - (1 << (bufferIndex + Log2InitialCapacity - 1));
+            return ref GetBuffer(bufferIndex)[elementIndex];
+        }
+
+        public ref T ItemAt2(int index)
+        {
+            Debug.Assert(index >= 0 && index < _size);
+
+            int i = index;
+            foreach (T[] buf in _tail)
             {
-                _head = new T[initialCapacity];
-                _capacity = initialCapacity;
-                return;
+                if (i < buf.Length)
+                {
+                    return ref buf[i];
+                }
+                i -= buf.Length;
             }
 
-            _tail.Add(_head);
-            // We want to increase the block sizes geometrically, but not on the first resize.
-            // This ensures we never waste more than 50% of the memory we've allocated.
-            int nextCapacity = _capacity == initialCapacity
-                ? initialCapacity
-                : HeadCapacity * 2;
-            _head = new T[nextCapacity];
-            _headCount = 0;
-            _capacity += nextCapacity;
+            Debug.Assert(i < _head.Length);
+            return ref _head[i];
         }
 
-        [ExcludeFromCodeCoverage]
-        T IList<T>.this[int index]
+        public Enumerator GetEnumerator() => new Enumerator(this);
+
+        // Section 5.4: 'function To_raw_array(L)' for growth arrays
+
+        public T[] ToRawArray()
         {
-            get => this[index];
-            set => this[index] = value;
+            var array = new T[_size];
+            // DEVIATION FROM PAPER: Copying to the raw array is done in the helper function CopyTo.
+            // CopyTo is more flexible than ToRawArray, since it can copy to an existing array in order
+            // to avoid allocating memory.
+            CopyTo(array, 0);
+            return array;
+        }
+
+        public void CopyTo(T[] array, int arrayIndex)
+        {
+            Debug.Assert(array != null);
+            Debug.Assert(arrayIndex >= 0 && array.Length - arrayIndex >= _size);
+
+            foreach (T[] buf in _tail)
+            {
+                Array.Copy(buf, 0, array, arrayIndex, buf.Length);
+                arrayIndex += buf.Length;
+            }
+
+            Array.Copy(_head, 0, array, arrayIndex, _hsize);
         }
 
         [ExcludeFromCodeCoverage]
-        T IReadOnlyList<T>.this[int index] => this[index];
-
-        [ExcludeFromCodeCoverage]
-        bool ICollection<T>.IsReadOnly => false;
+        private string DebuggerDisplay => $"{nameof(Size)} = {Size}";
 
         [ExcludeFromCodeCoverage]
         IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();

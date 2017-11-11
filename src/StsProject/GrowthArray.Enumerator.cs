@@ -6,7 +6,7 @@ using StsProject.Internal.Diagnostics;
 
 namespace StsProject
 {
-    public partial class GrowthArray<T> : IList<T>
+    public partial struct GrowthArray<T>
     {
         public struct Enumerator : IEnumerator<T>
         {
@@ -34,7 +34,7 @@ namespace StsProject
 
             public bool MoveNext()
             {
-                if (_elementIndex + 1 == _currentBlock.Count)
+                if (_elementIndex + 1 == _currentBlock.Size)
                 {
                     if (_blockIndex + 1 == _blocks.Count)
                     {

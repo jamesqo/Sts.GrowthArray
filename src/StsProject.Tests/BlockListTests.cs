@@ -321,7 +321,7 @@ namespace StsProject.Tests
                 Assert.Equal(contents, buffer);
             }
             
-            void CheckToArray() => Assert.Equal(contents, list.ToArray());
+            void CheckToArray() => Assert.Equal(contents, list.ToRawArray());
 
             CheckCount(list, contents.Count());
 
