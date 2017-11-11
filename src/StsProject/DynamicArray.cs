@@ -6,75 +6,33 @@ using StsProject.Internal.Diagnostics;
 
 namespace StsProject
 {
-    /// <summary>
-    /// A list optimized for a small number of items.
-    /// </summary>
-    /// <typeparam name="T">The type of the items.</typeparam>
     [DebuggerDisplay(DebuggerStrings.DisplayFormat)]
     [DebuggerTypeProxy(typeof(EnumerableDebuggerProxy<>))]
     internal partial struct DynamicArray<T> : IEnumerable<T>
     {
-        /// <summary>
-        /// The size of this list's buffer after the first item is added.
-        /// </summary>
-        private const int InitialCapacity = 4;
+        private const int GrowthFactor = 2;
+        private const int InitialCapacity = 8;
 
-        /// <summary>
-        /// The buffer where this list's items are stored.
-        /// </summary>
         private T[] _buf;
-
-        /// <summary>
-        /// The number of items in this list.
-        /// </summary>
         private int _size;
 
-        /// <summary>
-        /// Gets the number of items this list can hold before resizing.
-        /// </summary>
-        public int Capacity => _buf?.Length ?? 0;
+        // Section 3: 'procedure Constructor(L)' for dynamic arrays
 
-        /// <summary>
-        /// Gets the number of items in this list.
-        /// </summary>
-        public int Count => _size;
-
-        [ExcludeFromCodeCoverage]
-        private string DebuggerDisplay => $"{nameof(Count)} = {Count}";
-
-        /// <summary>
-        /// Gets a value indicating whether this list is empty.
-        /// </summary>
-        public bool IsEmpty => _size == 0;
-
-        /// <summary>
-        /// Gets a value indicating whether this list is full.
-        /// </summary>
-        private bool IsFull => _size == Capacity;
-
-        /// <summary>
-        /// Gets or sets an item in this list.
-        /// </summary>
-        /// <param name="index">The index.</param>
-        /// <returns>The item at the specified index.</returns>
-        public T this[int index]
+        public static DynamicArray<T> Create()
         {
-            get
-            {
-                Debug.Assert(index >= 0 && index < _size);
-                return _buf[index];
-            }
-            set
-            {
-                Debug.Assert(index >= 0 && index < _size);
-                _buf[index] = value;
-            }
+            var dynamicArray = default(DynamicArray<T>);
+            dynamicArray._buf = new T[InitialCapacity];
+            return dynamicArray;
         }
 
-        /// <summary>
-        /// Adds an item to this list.
-        /// </summary>
-        /// <param name="item">The item to add.</param>
+        public int Capacity => _buf.Length;
+
+        public int Size => _size;
+
+        public bool IsFull => _size == Capacity;
+
+        // Section 5.1: 'procedure Append(L, item)' for dynamic arrays
+
         public void Append(T item)
         {
             if (IsFull)
@@ -85,42 +43,31 @@ namespace StsProject
             _buf[_size++] = item;
         }
 
-        /// <summary>
-        /// Gets an enumerator that iterates through this list.
-        /// </summary>
-        public Enumerator GetEnumerator() => new Enumerator(_buf, _size);
-
-        /// <summary>
-        /// Removes the last item of this list.
-        /// </summary>
-        /// <returns>The removed item.</returns>
-        public T RemoveLast()
-        {
-            Debug.Assert(!IsEmpty);
-
-            return _buf[--_size];
-        }
-
-        /// <summary>
-        /// Resizes this list when it is full.
-        /// </summary>
         private void Grow()
         {
             Debug.Assert(IsFull);
 
-            T[] newBuf;
-            if (IsEmpty)
-            {
-                newBuf = new T[InitialCapacity];
-            }
-            else
-            {
-                newBuf = new T[_size * 2];
-                Array.Copy(_buf, 0, newBuf, 0, _size);
-            }
-            
+            T[] newBuf = new T[_size * GrowthFactor];
+            Array.Copy(_buf, 0, newBuf, 0, _size);
+
             _buf = newBuf;
         }
+
+        // Section 5.2: 'function Get_item(L, index)' for dynamic arrays
+
+        public ref T this[int index]
+        {
+            get
+            {
+                Debug.Assert(index >= 0 && index < _size);
+                return ref _buf[index];
+            }
+        }
+
+        public Enumerator GetEnumerator() => new Enumerator(_buf, _size);
+
+        [ExcludeFromCodeCoverage]
+        private string DebuggerDisplay => $"{nameof(Size)} = {Size}";
 
         [ExcludeFromCodeCoverage]
         IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();

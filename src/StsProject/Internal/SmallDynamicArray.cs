@@ -2,55 +2,33 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using StsProject.Internal.Diagnostics;
 
 namespace StsProject
 {
-    /// <summary>
-    /// A list optimized for a small number of items.
-    /// </summary>
-    /// <typeparam name="T">The type of the items.</typeparam>
     [DebuggerDisplay(DebuggerStrings.DisplayFormat)]
     [DebuggerTypeProxy(typeof(EnumerableDebuggerProxy<>))]
     internal partial struct SmallDynamicArray<T> : IEnumerable<T>
     {
-        /// <summary>
-        /// The size of this list's buffer after the first item is added.
-        /// </summary>
+        private const int GrowthFactor = 2;
         private const int InitialCapacity = 4;
 
-        /// <summary>
-        /// The buffer where this list's items are stored.
-        /// </summary>
         private T[] _buf;
-
-        /// <summary>
-        /// The number of items in this list.
-        /// </summary>
         private int _size;
 
-        /// <summary>
-        /// Gets the number of items this list can hold before resizing.
-        /// </summary>
-        public int Capacity => _buf?.Length ?? 0;
+        public static SmallDynamicArray<T> Create()
+        {
+            var dynamicArray = default(SmallDynamicArray<T>);
+            dynamicArray._buf = Array.Empty<T>();
+            return dynamicArray;
+        }
 
-        /// <summary>
-        /// Gets the number of items in this list.
-        /// </summary>
-        public int Count => _size;
+        public int Capacity => _buf.Length;
 
-        [ExcludeFromCodeCoverage]
-        private string DebuggerDisplay => $"{nameof(Count)} = {Count}";
+        public int Size => _size;
 
-        /// <summary>
-        /// Gets a value indicating whether this list is empty.
-        /// </summary>
-        public bool IsEmpty => _size == 0;
-
-        /// <summary>
-        /// Gets a value indicating whether this list is full.
-        /// </summary>
-        private bool IsFull => _size == Capacity;
+        public bool IsFull => _size == Capacity;
 
         public ref T this[int index]
         {
@@ -71,37 +49,18 @@ namespace StsProject
             _buf[_size++] = item;
         }
 
-        /// <summary>
-        /// Gets an enumerator that iterates through this list.
-        /// </summary>
-        public Enumerator GetEnumerator() => new Enumerator(_buf, _size);
-
-        /// <summary>
-        /// Removes the last item of this list.
-        /// </summary>
-        /// <returns>The removed item.</returns>
-        public T RemoveLast()
-        {
-            Debug.Assert(!IsEmpty);
-
-            return _buf[--_size];
-        }
-
-        /// <summary>
-        /// Resizes this list when it is full.
-        /// </summary>
         private void Grow()
         {
             Debug.Assert(IsFull);
 
             T[] newBuf;
-            if (IsEmpty)
+            if (_size == 0)
             {
                 newBuf = new T[InitialCapacity];
             }
             else
             {
-                newBuf = new T[_size * 2];
+                newBuf = new T[_size * GrowthFactor];
                 Array.Copy(_buf, 0, newBuf, 0, _size);
             }
             
@@ -109,9 +68,12 @@ namespace StsProject
         }
 
         [ExcludeFromCodeCoverage]
-        IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
+        private string DebuggerDisplay => $"{nameof(Size)} = {Size}";
 
         [ExcludeFromCodeCoverage]
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() => _buf.Take(_size).GetEnumerator();
+
+        [ExcludeFromCodeCoverage]
+        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<T>)this).GetEnumerator();
     }
 }

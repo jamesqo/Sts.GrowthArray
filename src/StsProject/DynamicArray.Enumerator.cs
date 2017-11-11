@@ -5,8 +5,9 @@ using StsProject.Internal.Diagnostics;
 
 namespace StsProject
 {
-    internal partial struct SmallDynamicArray<T>
+    internal partial struct DynamicArray<T>
     {
+
         public struct Enumerator : IEnumerator<T>
         {
             private readonly T[] _array;

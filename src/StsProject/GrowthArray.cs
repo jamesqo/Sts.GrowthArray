@@ -23,7 +23,7 @@ namespace StsProject
         // ideal for it to make computations to calculate what the head size should be.
 
         private T[] _head;
-        private DynamicArray<T[]> _tail; // This is a mutable struct field, so do not make it readonly.
+        private SmallDynamicArray<T[]> _tail; // This is a mutable struct field, so do not make it readonly.
         private int _size;
         private int _hsize;
 
