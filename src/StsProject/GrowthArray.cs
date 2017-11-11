@@ -54,8 +54,6 @@ namespace StsProject
 
         public bool IsFull => _size == Capacity;
 
-        public int Size => _size;
-
         // Section 5.1: 'procedure Append(L, item)' for growth arrays
 
         public void Add(T item)
@@ -85,26 +83,38 @@ namespace StsProject
             _hsize = 0;
         }
 
-        // Section 5.2: 'function Get_item(L, index)' for growth arrays
+        // Section 5.2: 'function Get_item(L, index)' for growth arrays, O(1) implementation
 
-        // DEVIATION FROM PAPER: The functions are named 'ItemAt*' and return a 'ref T' instead of a 'T'.
-        // Instead of returning a value, they are returning the address of a value.
+        // DEVIATION FROM PAPER: The functions return a 'ref T' instead of a 'T'.
+        // Instead of returning a value, they return the address of a value.
         // This is useful because a value may be updated based on its current value, for example
-        // 'ref int value = L.ItemAt1(index); value = value + 10;', without running the calculations
-        // in ItemAt1 twice.
+        // 'ref int value = L[index]; value = value + 10;', without running the calculations
+        // in the indexer twice.
 
-        public ref T ItemAt1(int index)
+        public ref T this[int index]
         {
-            Debug.Assert(index >= 0 && index < _size);
+            get
+            {
+                Debug.Assert(index >= 0 && index < _size);
 
-            // DEVIATION FROM PAPER: For better performance, the 'Decompose' algorithm
-            // is written inline instead of in a separate function.
-            var bufferIndex = Math.Max(MathHelpers.CeilLog2(index + 1) - Log2InitialCapacity, 0);
-            var elementIndex = index - (1 << (bufferIndex + Log2InitialCapacity - 1));
-            return ref GetBuffer(bufferIndex)[elementIndex];
+                // DEVIATION FROM PAPER: For better performance, the 'Decompose' algorithm
+                // is written inline instead of in a separate function.
+                var bufferIndex = Math.Max(MathHelpers.CeilLog2(index + 1) - Log2InitialCapacity, 0);
+                var elementIndex = index - (1 << (bufferIndex + Log2InitialCapacity - 1));
+                return ref GetBuffer(bufferIndex)[elementIndex];
+            }
         }
 
-        public ref T ItemAt2(int index)
+        public T[] GetBuffer(int bufferIndex)
+        {
+            Debug.Assert(bufferIndex >= 0 && bufferIndex <= _tail.Size);
+
+            return bufferIndex < _tail.Size ? _tail[bufferIndex] : _head;
+        }
+
+        // Section 5.2: 'function Get_item(L, index)' for growth arrays, O(log n) implementation
+
+        public ref T GetItemLogarithmic(int index)
         {
             Debug.Assert(index >= 0 && index < _size);
 
@@ -122,7 +132,22 @@ namespace StsProject
             return ref _head[i];
         }
 
+        // Section 5.3: Iterating for growth arrays
+
+        // In C#, iteration is typically done with an 'enumerator' object that describes how to iterate
+        // over a collection. This allows one to write 'foreach (var item in collection) { ..code.. }'
+        // The implementation of the algorithm lives in the GrowthArray.Enumerator.cs file.
+
         public Enumerator GetEnumerator() => new Enumerator(this);
+
+        public BufferSpan<T> GetBufferSpan(int bufferIndex)
+        {
+            Debug.Assert(bufferIndex >= 0 && bufferIndex <= _tail.Size);
+
+            return bufferIndex < _tail.Size ?
+                new BufferSpan<T>(_tail[bufferIndex]) :
+                new BufferSpan<T>(_head, _hsize);
+        }
 
         // Section 5.4: 'function To_raw_array(L)' for growth arrays
 
@@ -151,7 +176,7 @@ namespace StsProject
         }
 
         [ExcludeFromCodeCoverage]
-        private string DebuggerDisplay => $"{nameof(Size)} = {Size}";
+        private string DebuggerDisplay => $"Size = {_size}";
 
         [ExcludeFromCodeCoverage]
         IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();

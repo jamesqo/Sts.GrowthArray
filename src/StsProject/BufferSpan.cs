@@ -2,29 +2,26 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using StsProject.Internal;
 using StsProject.Internal.Diagnostics;
 
 namespace StsProject
 {
     [DebuggerDisplay(DebuggerStrings.DisplayFormat)]
     [DebuggerTypeProxy(typeof(EnumerableDebuggerProxy<>))]
-    public partial struct Buffer<T> : IEnumerable<T>
+    public partial struct BufferSpan<T> : IEnumerable<T>
     {
-        internal static readonly Buffer<T> Empty = new Buffer<T>(System.Array.Empty<T>());
-
-        internal Buffer(T[] array)
+        internal BufferSpan(T[] array)
         {
-            Verify.NotNull(array, nameof(array));
+            Debug.Assert(array != null);
 
             Array = array;
             Size = array.Length;
         }
 
-        internal Buffer(T[] array, int size)
+        internal BufferSpan(T[] array, int size)
         {
-            Verify.NotNull(array, nameof(array));
-            Verify.InRange(size >= 0 && size <= array.Length, nameof(size));
+            Debug.Assert(array != null);
+            Debug.Assert(size >= 0 && size <= array.Length);
 
             Array = array;
             Size = size;
@@ -34,7 +31,14 @@ namespace StsProject
 
         public int Size { get; }
 
-        public ref T this[int index] => ref Array[index];
+        public ref T this[int index]
+        {
+            get
+            {
+                Debug.Assert(index >= 0 && index < Size);
+                return ref Array[index];
+            }
+        }
 
         public void CopyTo(T[] destination, int destinationIndex)
         {
@@ -42,7 +46,7 @@ namespace StsProject
         }
 
         [ExcludeFromCodeCoverage]
-        private string DebuggerDisplay => $"{nameof(Size)} = {Size}";
+        private string DebuggerDisplay => $"Size = {Size}";
 
         [ExcludeFromCodeCoverage]
         IEnumerator<T> IEnumerable<T>.GetEnumerator() => Array.Take(Size).GetEnumerator();

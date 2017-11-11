@@ -7,28 +7,39 @@ namespace StsProject
 {
     internal partial struct DynamicArray<T>
     {
+        // In C#, 'foreach (var item in collection) { ..code.. }' is translated by the compiler to:
+        //
+        // var e = collection.GetEnumerator();
+        // while (e.MoveNext())
+        // {
+        //     var item = e.Current;
+        //     ..code..
+        // }
+        //
+        // Under this call pattern, the following type defines an algorithm equivalent to the one
+        // presented in Section 5.3 for dynamic arrays.
 
         public struct Enumerator : IEnumerator<T>
         {
-            private readonly T[] _array;
-            private readonly int _count;
+            private readonly T[] _buf;
+            private readonly int _size;
 
             private int _index;
 
-            internal Enumerator(T[] array, int count)
+            internal Enumerator(T[] buf, int size)
             {
-                _array = array;
-                _count = count;
+                _buf = buf;
+                _size = size;
                 _index = -1;
             }
 
-            public T Current => _array[_index];
+            public T Current => _buf[_index];
 
             public void Dispose()
             {
             }
 
-            public bool MoveNext() => ++_index < _count;
+            public bool MoveNext() => ++_index < _size;
 
             [ExcludeFromCodeCoverage]
             object IEnumerator.Current => Current;

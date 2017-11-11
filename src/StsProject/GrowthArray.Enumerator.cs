@@ -1,32 +1,41 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using StsProject.Internal.Diagnostics;
 
 namespace StsProject
 {
     public partial struct GrowthArray<T>
     {
+        // In C#, 'foreach (var item in collection) { ..code.. }' is translated by the compiler to:
+        //
+        // var e = collection.GetEnumerator();
+        // while (e.MoveNext())
+        // {
+        //     var item = e.Current;
+        //     ..code..
+        // }
+        //
+        // Under this call pattern, the following type defines an algorithm equivalent to the one
+        // presented in Section 5.3 for growth arrays.
+
         public struct Enumerator : IEnumerator<T>
         {
-            private readonly BlockView<T> _blocks;
+            private readonly GrowthArray<T> _growthArray;
 
-            private Buffer<T> _currentBlock;
-            private int _blockIndex;
+            private BufferSpan<T> _currentSpan;
+            private int _bufferIndex;
             private int _elementIndex;
 
-            internal Enumerator(GrowthArray<T> list)
-                : this()
+            internal Enumerator(GrowthArray<T> growthArray)
             {
-                Debug.Assert(list != null);
-
-                _blocks = list.Blocks;
-                _currentBlock = _blocks[0];
+                _growthArray = growthArray;
+                _currentSpan = growthArray.GetBufferSpan(0);
+                _bufferIndex = 0;
                 _elementIndex = -1;
             }
 
-            public T Current => _currentBlock[_elementIndex];
+            public T Current => _currentSpan[_elementIndex];
 
             public void Dispose()
             {
@@ -34,14 +43,14 @@ namespace StsProject
 
             public bool MoveNext()
             {
-                if (_elementIndex + 1 == _currentBlock.Size)
+                if (_elementIndex + 1 == _currentSpan.Size)
                 {
-                    if (_blockIndex + 1 == _blocks.Count)
+                    if (_bufferIndex == _growthArray._tail.Size)
                     {
                         return false;
                     }
 
-                    _currentBlock = _blocks[++_blockIndex];
+                    _currentSpan = _growthArray.GetBufferSpan(++_bufferIndex);
                     _elementIndex = -1;
                 }
 

@@ -12,6 +12,9 @@ namespace StsProject
     internal partial struct SmallDynamicArray<T> : IEnumerable<T>
     {
         private const int GrowthFactor = 2;
+        // DEVIATION FROM DynamicArray: The "initial capacity" is 4 instead of 8.
+        // NOTE: Because this dynamic array implementation waits as long as possible before allocating,
+        // the true initial capacity is 0. (See comments below.)
         private const int InitialCapacity = 4;
 
         private T[] _buf;
@@ -20,6 +23,10 @@ namespace StsProject
         public static SmallDynamicArray<T> Create()
         {
             var dynamicArray = default(SmallDynamicArray<T>);
+            // DEVIATION FROM DynamicArray: The true initial capacity is 0, such that no allocations are
+            // made until the first item is appended. This benefits GrowthArray because the tail will not
+            // allocate until (c_0 + 1) items are appended, where c_0 is the initial capacity of the growth
+            // array.
             dynamicArray._buf = Array.Empty<T>();
             return dynamicArray;
         }
@@ -29,15 +36,6 @@ namespace StsProject
         public int Size => _size;
 
         public bool IsFull => _size == Capacity;
-
-        public ref T this[int index]
-        {
-            get
-            {
-                Debug.Assert(index >= 0 && index < _size);
-                return ref _buf[index];
-            }
-        }
 
         public void Append(T item)
         {
@@ -56,6 +54,9 @@ namespace StsProject
             T[] newBuf;
             if (_size == 0)
             {
+                // DEVIATION FROM DynamicArray: Because this initially called when the capacity is 0,
+                // _size == 0 so _size * GrowthFactor == 0. This case needs to be handled specially in
+                // order to allocate a bigger buffer.
                 newBuf = new T[InitialCapacity];
             }
             else
@@ -67,8 +68,17 @@ namespace StsProject
             _buf = newBuf;
         }
 
+        public ref T this[int index]
+        {
+            get
+            {
+                Debug.Assert(index >= 0 && index < _size);
+                return ref _buf[index];
+            }
+        }
+
         [ExcludeFromCodeCoverage]
-        private string DebuggerDisplay => $"{nameof(Size)} = {Size}";
+        private string DebuggerDisplay => $"Size = {Size}";
 
         [ExcludeFromCodeCoverage]
         IEnumerator<T> IEnumerable<T>.GetEnumerator() => _buf.Take(_size).GetEnumerator();
