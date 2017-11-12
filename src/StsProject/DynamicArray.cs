@@ -3,16 +3,20 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using StsProject.Internal.Diagnostics;
+using static StsProject.DynamicArray;
 
 namespace StsProject
 {
+    public static class DynamicArray
+    {
+        public const int GrowthFactor = 2;
+        public const int InitialCapacity = 8;
+    }
+
     [DebuggerDisplay(DebuggerStrings.DisplayFormat)]
     [DebuggerTypeProxy(typeof(EnumerableDebuggerProxy<>))]
-    internal partial struct DynamicArray<T> : IEnumerable<T>
+    public partial struct DynamicArray<T> : IArrayCollection<T>, IEnumerable<T>, IArrayCollectionSettings
     {
-        private const int GrowthFactor = 2;
-        private const int InitialCapacity = 8;
-
         private T[] _buf;
         private int _size;
 
@@ -28,6 +32,8 @@ namespace StsProject
         public int Capacity => _buf.Length;
 
         public bool IsFull => _size == Capacity;
+
+        public int Size => _size;
 
         // Section 5.1: 'procedure Append(L, item)' for dynamic arrays
 
@@ -98,5 +104,11 @@ namespace StsProject
 
         [ExcludeFromCodeCoverage]
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        IArrayCollectionSettings IArrayCollection<T>.Settings => this;
+
+        int IArrayCollectionSettings.GrowthFactor => GrowthFactor;
+
+        int IArrayCollectionSettings.InitialCapacity => InitialCapacity;
     }
 }

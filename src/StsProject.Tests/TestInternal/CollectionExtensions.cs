@@ -3,8 +3,17 @@ using System.Linq;
 
 namespace StsProject.Tests.TestInternal
 {
-    internal static class EnumerableExtensions
+    internal static class CollectionExtensions
     {
+        public static void AddIfNotNull<T>(this ICollection<T> collection, T item)
+            where T : class
+        {
+            if (item != null)
+            {
+                collection.Add(item);
+            }
+        }
+
         public static bool ContainsDuplicates<T>(this IEnumerable<T> source, IEqualityComparer<T> comparer = null)
         {
             var set = new HashSet<T>(comparer);

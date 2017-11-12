@@ -45,7 +45,7 @@ namespace StsProject
             {
                 if (_elementIndex + 1 == _currentSpan.Size)
                 {
-                    if (_bufferIndex == _growthArray._tail.Size)
+                    if (_bufferIndex + 1 == _growthArray.NumberOfBuffers)
                     {
                         return false;
                     }

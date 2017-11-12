@@ -4,19 +4,24 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using StsProject.Internal;
 using StsProject.Internal.Diagnostics;
+using static StsProject.GrowthArray;
 
 namespace StsProject
 {
+    public static class GrowthArray
+    {
+        public const int GrowthFactor = 2;
+        public const int InitialCapacity = 8;
+    }
+
     [DebuggerDisplay(DebuggerStrings.DisplayFormat)]
     [DebuggerTypeProxy(typeof(EnumerableDebuggerProxy<>))]
-    public partial struct GrowthArray<T> : IEnumerable<T>
+    public partial struct GrowthArray<T> : IArrayCollection<T>, IEnumerable<T>, IArrayCollectionSettings
     {
-        // The growth factor, g, is 2. However, it is not declared as a constant here because the indexing
-        // algorithm cannot be adapted to any other value of g.
-        private const int InitialCapacity = 8;
         private const int Log2InitialCapacity = 3;
 
         // Section 3: Fields for growth arrays
+
         // DEVIATION FROM PAPER: In the paper, Cap is a field and Hsize is a property defined in terms of Cap.
         // In this code, Hsize is a field and Capacity is a property defined in terms of Hsize.
         // This is because Hsize is used in the appending algorithm, which is performance-sensitive. It is not
@@ -54,9 +59,13 @@ namespace StsProject
 
         public bool IsFull => _size == Capacity;
 
+        public int NumberOfBuffers => _tail.Size + 1;
+
+        public int Size => _size;
+
         // Section 5.1: 'procedure Append(L, item)' for growth arrays
 
-        public void Add(T item)
+        public void Append(T item)
         {
             if (IsFull)
             {
@@ -73,8 +82,8 @@ namespace StsProject
 
             _tail.Append(_head);
             var newHcap = HeadCapacity == InitialCapacity ?
-                (2 - 1) * InitialCapacity :
-                2 * HeadCapacity;
+                (GrowthFactor - 1) * InitialCapacity :
+                GrowthFactor * HeadCapacity;
             _head = new T[newHcap];
             _size = Capacity + newHcap;
 
@@ -183,5 +192,11 @@ namespace StsProject
 
         [ExcludeFromCodeCoverage]
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        IArrayCollectionSettings IArrayCollection<T>.Settings => this;
+
+        int IArrayCollectionSettings.GrowthFactor => GrowthFactor;
+
+        int IArrayCollectionSettings.InitialCapacity => InitialCapacity;
     }
 }

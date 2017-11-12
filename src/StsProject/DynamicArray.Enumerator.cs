@@ -5,7 +5,7 @@ using StsProject.Internal.Diagnostics;
 
 namespace StsProject
 {
-    internal partial struct DynamicArray<T>
+    public partial struct DynamicArray<T>
     {
         // In C#, 'foreach (var item in collection) { ..code.. }' is translated by the compiler to:
         //
