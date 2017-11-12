@@ -74,19 +74,6 @@ namespace StsProject.Tests
 
         protected virtual void ValidateContents(TCollection collection, IEnumerable<int> expected)
         {
-            // TODO
-            //void ValidateBlocks()
-            //{
-            //    int elementIndex = 0;
-
-            //    for (int i = 0; i < growthArray.NumberOfBuffers; i++)
-            //    {
-            //        var span = growthArray.GetBufferSpan(i);
-            //        Assert.Equal(expected.Skip(elementIndex).Take(span.Size), span);
-            //        elementIndex += span.Size;
-            //    }
-            //}
-
             void ValidateCopyTo()
             {
                 var buffer = new int[collection.Size];
@@ -117,7 +104,6 @@ namespace StsProject.Tests
 
             ValidateSize(collection, expected.Count());
 
-            //ValidateBlocks();
             ValidateCopyTo();
             ValidateExplicitGetEnumerator();
             ValidateGetEnumerator();
@@ -127,13 +113,9 @@ namespace StsProject.Tests
         protected virtual void ValidateEmpty(TCollection collection)
         {
             ValidateContents(collection, Array.Empty<int>());
-
-            // TODO
-            // var emptySpan = growthArray.GetBufferSpan(0);
-            // Assert.Empty(emptySpan);
         }
 
-        private static void ValidateSize(TCollection collection, int size)
+        protected virtual void ValidateSize(TCollection collection, int size)
         {
             int g = collection.Settings.GrowthFactor;
             int c0 = collection.Settings.InitialCapacity;
@@ -148,42 +130,8 @@ namespace StsProject.Tests
                 return expected;
             }
 
-            // TODO:
-            //int ExpectedNumberOfBuffers()
-            //{
-            //    int expected = 1;
-            //    for (int i = c0; i < size; i *= g)
-            //    {
-            //        expected++;
-            //    }
-            //    return expected;
-            //}
-
             Assert.Equal(size, collection.Size);
-            // TODO: Assert.Equal(ExpectedNumberOfBuffers(), growthArray.NumberOfBuffers);
             Assert.Equal(ExpectedCapacity(), collection.Capacity);
         }
-
-        //private static IEnumerable<int> GetTestIndices(int listCount, bool exclusive)
-        //{
-        //    Debug.Assert(listCount >= 0);
-
-        //    var indices = new[]
-        //    {
-        //        0,
-        //        1,
-        //        listCount / 4,
-        //        listCount / 4 + 1,
-        //        listCount / 2,
-        //        listCount / 2 + 1,
-        //        3 * listCount / 4,
-        //        3 * listCount / 4 + 1,
-        //        listCount - 1,
-        //        listCount
-        //    };
-
-        //    return indices.Where(
-        //        index => index >= 0 && (exclusive ? index < listCount : index <= listCount));
-        //}
     }
 }

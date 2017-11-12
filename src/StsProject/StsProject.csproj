@@ -6,4 +6,13 @@
     <DebugType>full</DebugType> <!-- Needed for code coverage to work. See https://github.com/OpenCover/opencover/issues/601 -->
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Update="IArrayCollectionSettings.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Internal\MathHelpers.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
 </Project>

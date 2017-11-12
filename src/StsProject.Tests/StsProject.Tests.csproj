@@ -25,7 +25,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="TestInternal\TheoryDataExtensions.cs">
+    <Compile Update="GrowthArrayTests.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="TestData.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="TestInternal\ClassData.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
