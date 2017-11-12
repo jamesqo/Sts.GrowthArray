@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
@@ -8,7 +9,7 @@ namespace StsProject.Tests
     {
         protected override GrowthArray<int> CreateCollection()
         {
-            return new GrowthArray<int>();
+            return GrowthArray<int>.Create();
         }
 
         protected override void ValidateContents(GrowthArray<int> collection, IEnumerable<int> expected)

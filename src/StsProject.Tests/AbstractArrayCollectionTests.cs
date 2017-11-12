@@ -35,7 +35,7 @@ namespace StsProject.Tests
             int c0 = collection.Settings.InitialCapacity;
 
             // The collection is full iff n = g^k * c0 for some integer k.
-            bool expected = Math.Log((double)items.Count() / c0, g) % 1 == 0;
+            bool expected = items.Any() && Math.Log((double)items.Count() / c0, g) % 1 == 0;
 
             Assert.Equal(expected, collection.IsFull);
         }

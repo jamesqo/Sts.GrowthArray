@@ -6,7 +6,7 @@ set OpenCoverVersion=4.6.519
 set OpenCoverPath="%PackageRoot%\OpenCover\%OpenCoverVersion%\tools\OpenCover.Console.exe"
 set DotNetPath="%PROGRAMFILES%\dotnet\dotnet.exe"
 
-set ReportGeneratorVersion=2.5.8
+set ReportGeneratorVersion=3.0.2
 set ReportGeneratorPath="%PackageRoot%\ReportGenerator\%ReportGeneratorVersion%\tools\ReportGenerator.exe"
 set ReportDirectory="%~dp0reports"
 

@@ -57,6 +57,8 @@ namespace StsProject
 
         public int HeadCapacity => _head.Length;
 
+        public int HeadSize => _hsize;
+
         public bool IsFull => _size == Capacity;
 
         public int NumberOfBuffers => _tail.Size + 1;
@@ -81,15 +83,17 @@ namespace StsProject
             Debug.Assert(IsFull);
 
             _tail.Append(_head);
-            var newHcap = HeadCapacity == InitialCapacity ?
+            var newHcap = Capacity == InitialCapacity ?
                 (GrowthFactor - 1) * InitialCapacity :
                 GrowthFactor * HeadCapacity;
             _head = new T[newHcap];
-            _size = Capacity + newHcap;
 
             // DEVIATION FROM PAPER: I introduced an _hsize field which I must set to 0,
             // since no items have been appended to the new head.
             _hsize = 0;
+
+            // DEVIATION FROM PAPER: I do not update Capacity since it is a property, not a field.
+            // Its value will automatically update due to changes in HeadCapacity and HeadSize.
         }
 
         // Section 5.2: 'function Get_item(L, index)' for growth arrays, O(1) implementation
