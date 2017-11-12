@@ -16,7 +16,7 @@ namespace StsProject
 
     [DebuggerDisplay(DebuggerStrings.DisplayFormat)]
     [DebuggerTypeProxy(typeof(EnumerableDebuggerProxy<>))]
-    public partial struct GrowthArray<T> : IArrayCollection<T>, IEnumerable<T>, IArrayCollectionSettings
+    public partial class GrowthArray<T> : IArrayCollection<T>, IEnumerable<T>, IArrayCollectionSettings
     {
         private const int Log2InitialCapacity = 3;
 
@@ -34,23 +34,20 @@ namespace StsProject
 
         // Section 3: 'procedure Constructor(L)' for growth arrays
 
-        public static GrowthArray<T> Create()
+        public GrowthArray()
         {
-            var growthArray = default(GrowthArray<T>);
+            _head = new T[InitialCapacity];
 
-            growthArray._head = new T[InitialCapacity];
             // DEVIATION FROM PAPER: Instead of using the type DynamicArray, which must have the same configuration
             // (g and c_0 values) as GrowthArray for comparison purposes, I use a modified dynamic array implementation
             // optimized for a small number of items. I do this because the size of the tail is O(log n).
-            growthArray._tail = SmallDynamicArray<T[]>.Create();
+            _tail = SmallDynamicArray<T[]>.Create();
 
-            // DEVIATION FROM PAPER: The following lines are not necessary because 'growthArray' was default-initialized.
-            // This means that all numerical fields are already set to 0.
+            // DEVIATION FROM PAPER: The following lines are not necessary because C# default-initializes fields when
+            // an object is instantiated. This means that all numerical fields are already set to 0.
 
-            // growthArray._size = 0;
-            // growthArray._hsize = 0;
-
-            return growthArray;
+            // _size = 0;
+            // _hsize = 0;
         }
 
         public int Capacity => (_size - _hsize) + HeadCapacity;

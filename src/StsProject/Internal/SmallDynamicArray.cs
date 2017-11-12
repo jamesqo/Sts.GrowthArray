@@ -22,6 +22,9 @@ namespace StsProject
         private T[] _buf;
         private int _size;
 
+        // DEVIATION FROM DynamicArray: Parameterless struct constructors are not allowed in C#.
+        // Therefore, SmallDynamicArray's "constructor" is a static factory method.
+
         public static SmallDynamicArray<T> Create()
         {
             var dynamicArray = default(SmallDynamicArray<T>);

@@ -15,18 +15,16 @@ namespace StsProject
 
     [DebuggerDisplay(DebuggerStrings.DisplayFormat)]
     [DebuggerTypeProxy(typeof(EnumerableDebuggerProxy<>))]
-    public partial struct DynamicArray<T> : IArrayCollection<T>, IEnumerable<T>, IArrayCollectionSettings
+    public partial class DynamicArray<T> : IArrayCollection<T>, IEnumerable<T>, IArrayCollectionSettings
     {
         private T[] _buf;
         private int _size;
 
         // Section 3: 'procedure Constructor(L)' for dynamic arrays
 
-        public static DynamicArray<T> Create()
+        public DynamicArray()
         {
-            var dynamicArray = default(DynamicArray<T>);
-            dynamicArray._buf = new T[InitialCapacity];
-            return dynamicArray;
+            _buf = new T[InitialCapacity];
         }
 
         public int Capacity => _buf.Length;

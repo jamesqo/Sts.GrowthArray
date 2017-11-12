@@ -30,12 +30,17 @@ namespace StsProject.Tests
         [ClassData(typeof(TestEnumerables_Data))]
         public void IsFull(IEnumerable<int> items)
         {
+            bool IsWholeNumber(double value)
+            {
+                return value >= 0 && value % 1 == 0;
+            }
+
             var collection = CreateCollection(items);
             int g = collection.Settings.GrowthFactor;
             int c0 = collection.Settings.InitialCapacity;
 
-            // The collection is full iff n = g^k * c0 for some integer k.
-            bool expected = items.Any() && Math.Log((double)items.Count() / c0, g) % 1 == 0;
+            // The collection is full iff n = g^k * c0 for some whole number k.
+            bool expected = items.Any() && IsWholeNumber(Math.Log((double)items.Count() / c0, g));
 
             Assert.Equal(expected, collection.IsFull);
         }

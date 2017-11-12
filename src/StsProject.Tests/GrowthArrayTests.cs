@@ -9,7 +9,7 @@ namespace StsProject.Tests
     {
         protected override GrowthArray<int> CreateCollection()
         {
-            return GrowthArray<int>.Create();
+            return new GrowthArray<int>();
         }
 
         protected override void ValidateContents(GrowthArray<int> collection, IEnumerable<int> expected)
