@@ -109,8 +109,21 @@ namespace StsProject
 
                 // DEVIATION FROM PAPER: For better performance, the 'Decompose' algorithm
                 // is written inline instead of in a separate function.
-                var bufferIndex = Math.Max(MathHelpers.CeilLog2(index + 1) - Log2InitialCapacity, 0);
-                var elementIndex = index - (1 << (bufferIndex + Log2InitialCapacity - 1));
+                int bufferIndex, elementIndex;
+                // DEVIATION FROM PAPER: Recall from Lemma 5.1 that \lambda is 0 iff n <= c_0.
+                // 'bufferIndex' is \lambda at n = i + 1. Thus, we can avoid the expensive CeilLog2
+                // call when i + 1 <= c_0, or i < c_0.
+                if (index >= InitialCapacity)
+                {
+                    bufferIndex = Math.Max(MathHelpers.CeilLog2(index + 1) - Log2InitialCapacity, 0);
+                    elementIndex = index - (1 << (bufferIndex + Log2InitialCapacity - 1));
+                }
+                else
+                {
+                    bufferIndex = 0;
+                    elementIndex = index;
+                }
+
                 return ref GetBuffer(bufferIndex)[elementIndex];
             }
         }
