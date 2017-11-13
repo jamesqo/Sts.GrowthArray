@@ -31,6 +31,8 @@ namespace StsProject.Internal
         {
             Debug.Assert(value > 0);
 
+            // CREDIT: https://graphics.stanford.edu/~seander/bithacks.html, "Round up to the next highest power of 2".
+
             // What the middle 5 lines are doing are turning all of the bits after the most significant
             // set bit to 1.
             // e.g. If we have 00000000000010000000000000000000 after value--, it becomes
@@ -66,8 +68,8 @@ namespace StsProject.Internal
             Debug.Assert(value > 0);
             Debug.Assert((value & (value - 1)) == 0);
 
-            // NOTE: Credit for this idea is attributed to @mburbea at https://github.com/dotnet/corefx/issues/12425,
-            // where I first learned of this idea. I modified some of code from this file to use here:
+            // CREDIT: This idea is attributed to @mburbea at https://github.com/dotnet/corefx/issues/12425,
+            // where I first learned of this idea. I modified some of code from a file (s)he posted to use here:
             // https://gist.github.com/mburbea/c9a71ac1b1a25762c38c9fee7de0ddc2#file-bits-cs-L120
 
             // The algorithm for this involves the concept of De Bruijn sequences.
