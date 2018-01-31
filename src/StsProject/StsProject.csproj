@@ -7,9 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Update="IArrayCollectionSettings.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Update="Internal\MathHelpers.cs">
       <SubType>Code</SubType>
     </Compile>
