@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace StsProject
 {
@@ -26,7 +24,6 @@ namespace StsProject
 
     public static class ArrayCollectionExtensions
     {
-        // Convenience method. For testing purposes only.
         public static void AppendRange<T>(this IArrayCollection<T> collection, IEnumerable<T> items)
         {
             foreach (T item in items)

@@ -20,8 +20,6 @@ namespace StsProject
         private T[] _buf;
         private int _size;
 
-        // Section 3: 'procedure Constructor(L)' for dynamic arrays
-
         public DynamicArray()
         {
             _buf = new T[InitialCapacity];
@@ -32,8 +30,6 @@ namespace StsProject
         public bool IsFull => _size == Capacity;
 
         public int Size => _size;
-
-        // Section 5.1: 'procedure Append(L, item)' for dynamic arrays
 
         public void Append(T item)
         {
@@ -55,8 +51,6 @@ namespace StsProject
             _buf = newBuf;
         }
 
-        // Section 5.2: 'function Get_item(L, index)' for dynamic arrays
-
         public ref T this[int index]
         {
             get
@@ -66,22 +60,11 @@ namespace StsProject
             }
         }
 
-        // Section 5.3: Iterating for dynamic arrays
-
-        // In C#, iteration is typically done with an 'enumerator' object that describes how to iterate
-        // over a collection. This allows one to write 'foreach (var item in collection) { ..code.. }'
-        // The implementation of the algorithm lives in the DynamicArray.Enumerator.cs file.
-
         public Enumerator GetEnumerator() => new Enumerator(_buf, _size);
-
-        // Section 5.4: 'function To_raw_array(L)' for dynamic arrays
 
         public T[] ToRawArray()
         {
             var array = new T[_size];
-            // DEVIATION FROM PAPER: Copying to the raw array is done in the helper function CopyTo.
-            // CopyTo is more flexible than ToRawArray, since it can copy to an existing array in order
-            // to avoid allocating memory.
             CopyTo(array, 0);
             return array;
         }

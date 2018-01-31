@@ -20,34 +20,15 @@ namespace StsProject
     {
         private const int Log2InitialCapacity = 3;
 
-        // Section 3: Fields for growth arrays
-
-        // DEVIATION FROM PAPER: In the paper, Cap is a field and Hsize is a property defined in terms of Cap.
-        // In this code, Hsize is a field and Capacity is a property defined in terms of Hsize.
-        // This is because Hsize is used in the appending algorithm, which is performance-sensitive. It is not
-        // ideal for it to make computations to calculate what the head size should be.
-
         private T[] _head;
         private SmallDynamicArray<T[]> _tail; // This is a mutable struct field; do not make it readonly.
         private int _size;
         private int _hsize;
 
-        // Section 3: 'procedure Constructor(L)' for growth arrays
-
         public GrowthArray()
         {
             _head = new T[InitialCapacity];
-
-            // DEVIATION FROM PAPER: Instead of using the type DynamicArray, which must have the same configuration
-            // (g and c_0 values) as GrowthArray for comparison purposes, I use a modified dynamic array implementation
-            // optimized for a small number of items. I do this because the size of the tail is O(log n).
             _tail = SmallDynamicArray<T[]>.Create();
-
-            // DEVIATION FROM PAPER: The following lines are not necessary because C# default-initializes fields when
-            // an object is instantiated. This means that all numerical fields are already set to 0.
-
-            // _size = 0;
-            // _hsize = 0;
         }
 
         public int Capacity => (_size - _hsize) + HeadCapacity;
@@ -61,8 +42,6 @@ namespace StsProject
         public int NumberOfBuffers => _tail.Size + 1;
 
         public int Size => _size;
-
-        // Section 5.1: 'procedure Append(L, item)' for growth arrays
 
         public void Append(T item)
         {
@@ -84,22 +63,8 @@ namespace StsProject
                 (GrowthFactor - 1) * InitialCapacity :
                 GrowthFactor * HeadCapacity;
             _head = new T[newHcap];
-
-            // DEVIATION FROM PAPER: I introduced an _hsize field which I must set to 0,
-            // since no items have been appended to the new head.
             _hsize = 0;
-
-            // DEVIATION FROM PAPER: I do not update Capacity since it is a property, not a field.
-            // Its value will automatically update due to changes in HeadCapacity and HeadSize.
         }
-
-        // Section 5.2: 'function Get_item(L, index)' for growth arrays, O(1) implementation
-
-        // DEVIATION FROM PAPER: The functions return a 'ref T' instead of a 'T'.
-        // Instead of returning a value, they return the address of a value.
-        // This is useful because a value may be updated based on its current value, for example
-        // 'ref int value = L[index]; value = value + 10;', without running the calculations
-        // in the indexer twice.
 
         public ref T this[int index]
         {
@@ -107,12 +72,7 @@ namespace StsProject
             {
                 Debug.Assert(index >= 0 && index < _size);
 
-                // DEVIATION FROM PAPER: For better performance, the 'Decompose' algorithm
-                // is written inline instead of in a separate function.
                 int bufferIndex, elementIndex;
-                // DEVIATION FROM PAPER: Recall from Lemma 5.1 that \lambda is 0 iff n <= c_0.
-                // 'bufferIndex' is \lambda at n = i + 1. Thus, we can avoid the expensive CeilLog2
-                // call when i + 1 <= c_0, or i < c_0.
                 if (index >= InitialCapacity)
                 {
                     bufferIndex = Math.Max(MathHelpers.CeilLog2(index + 1) - Log2InitialCapacity, 0);
@@ -135,8 +95,6 @@ namespace StsProject
             return bufferIndex < _tail.Size ? _tail[bufferIndex] : _head;
         }
 
-        // Section 5.2: 'function Get_item(L, index)' for growth arrays, O(log n) implementation
-
         public ref T GetItemLogarithmic(int index)
         {
             Debug.Assert(index >= 0 && index < _size);
@@ -155,12 +113,6 @@ namespace StsProject
             return ref _head[i];
         }
 
-        // Section 5.3: Iterating for growth arrays
-
-        // In C#, iteration is typically done with an 'enumerator' object that describes how to iterate
-        // over a collection. This allows one to write 'foreach (var item in collection) { ..code.. }'
-        // The implementation of the algorithm lives in the GrowthArray.Enumerator.cs file.
-
         public Enumerator GetEnumerator() => new Enumerator(this);
 
         public BufferSpan<T> GetBufferSpan(int bufferIndex)
@@ -172,14 +124,9 @@ namespace StsProject
                 new BufferSpan<T>(_head, _hsize);
         }
 
-        // Section 5.4: 'function To_raw_array(L)' for growth arrays
-
         public T[] ToRawArray()
         {
             var array = new T[_size];
-            // DEVIATION FROM PAPER: Copying to the raw array is done in the helper function CopyTo.
-            // CopyTo is more flexible than ToRawArray, since it can copy to an existing array in order
-            // to avoid allocating memory.
             CopyTo(array, 0);
             return array;
         }
