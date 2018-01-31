@@ -83,6 +83,24 @@ namespace StsProject.Tests
             }
         }
 
+        [Theory]
+        [ClassData(typeof(TestEnumerables_Data))]
+        public void GetItemLogarithmic(IEnumerable<int> items)
+        {
+            var collection = CreateCollection(items);
+            var array = items.ToArray();
+            int newValue = checked(collection.MaxOrDefault() + 1);
+
+            for (int i = 0; i < collection.Size; i++)
+            {
+                Assert.Equal(array[i], collection.GetItemLogarithmic(i));
+                collection.GetItemLogarithmic(i) = newValue;
+                Assert.Equal(newValue, collection.GetItemLogarithmic(i));
+                collection.GetItemLogarithmic(i) = array[i];
+                Assert.Equal(array[i], collection.GetItemLogarithmic(i));
+            }
+        }
+
         private void ValidateContents(GrowthArray<int> collection, IEnumerable<int> expected)
         {
             void ValidateCopyTo()
