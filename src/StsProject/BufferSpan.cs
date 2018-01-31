@@ -7,8 +7,6 @@ using StsProject.Internal.Diagnostics;
 
 namespace StsProject
 {
-    // A BufferSpan with Size = s represents the first s items of its Buffer.
-
     [DebuggerDisplay(DebuggerStrings.DisplayFormat)]
     [DebuggerTypeProxy(typeof(EnumerableDebuggerProxy<>))]
     public partial struct BufferSpan<T> : IEnumerable<T>

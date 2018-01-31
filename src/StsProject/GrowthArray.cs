@@ -16,7 +16,7 @@ namespace StsProject
 
     [DebuggerDisplay(DebuggerStrings.DisplayFormat)]
     [DebuggerTypeProxy(typeof(EnumerableDebuggerProxy<>))]
-    public partial class GrowthArray<T> : IArrayCollection<T>, IEnumerable<T>, IArrayCollectionSettings
+    public partial class GrowthArray<T> : IEnumerable<T>
     {
         private const int Log2InitialCapacity = 3;
 
@@ -153,11 +153,5 @@ namespace StsProject
 
         [ExcludeFromCodeCoverage]
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-        IArrayCollectionSettings IArrayCollection<T>.Settings => this;
-
-        int IArrayCollectionSettings.GrowthFactor => GrowthFactor;
-
-        int IArrayCollectionSettings.InitialCapacity => InitialCapacity;
     }
 }
