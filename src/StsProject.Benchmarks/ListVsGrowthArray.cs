@@ -11,9 +11,9 @@ namespace StsProject.Benchmarks
     {
         [Params(
             // decimal
-            10, 25, 50/*,
-            100, 250, 500,
-            1000, 2500, 5000,
+            10, /*25, 50,
+            100,*/ 250, /*500,
+            1000, 2500,*/ 5000/*,
             10000, 25000, 50000,
             // binary
             // each row is 2^n, 2^n + 1, and the average of 2^n and 2^(n + 1)
@@ -28,7 +28,7 @@ namespace StsProject.Benchmarks
             4096, 4097, 6144,
             8192, 8193, 12288,
             16384, 16385, 24576,
-            32768, 32769, 49152
+            32768, 32769*/, 49152/*
             */)]
         public int N;
 
