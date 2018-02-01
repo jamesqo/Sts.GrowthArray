@@ -66,55 +66,26 @@ for (file in files) {
     group_by_(.dots = c("Target_Method", "Job_Id")) %>%
     summarise(se = std.error(Measurement_Value), Value = mean(Measurement_Value))
 
-  if (FALSE) {
   listDf <- result %>% filter(Target_Method == "List")
   listDf$N <- sapply(listDf$Params, function(param) strtoi(gsub("N=", "", param), base = 10))
-
-  listTimelinePlot <- ggplot(listDf, aes(x=N, y=Measurement_Value,color="List")) +
-    xlab("n") +
-    ylab(paste0("Time to append n items (", timeUnit, ")")) +
-    scale_x_log10() +
-    scale_y_log10() +
-    geom_line() +
-    geom_point()
-  #printNice(listTimelinePlot)
-  #ggsaveNice(gsub("-measurements.csv", paste0("-listTimeline.png"), file), listTimelinePlot)
-  }
-  
-  if (FALSE) {
-  growthDf <- result %>% filter(Target_Method == "GrowthArray")
-  growthDf$N <- sapply(growthDf$Params, function(param) strtoi(gsub("N=", "", param), base = 10))
-
-  growthTimelinePlot <- ggplot(growthDf, aes(x=N, y=Measurement_Value,color="GrowthArray")) +
-    xlab("n") +
-    ylab(paste0("Time to append n items (", timeUnit, ")")) +
-    scale_x_log10() +
-    scale_y_log10() +
-    geom_line() +
-    geom_point()
-  #printNice(growthTimelinePlot)
-  #ggsaveNice(gsub("-measurements.csv", paste0("-growthTimeline.png"), file), growthTimelinePlot)
-  }
-
-  listDf <- result %>% filter(Target_Method == "List")
-  listDf$N <- sapply(listDf$Params, function(param) strtoi(gsub("N=", "", param), base = 10))
-  listMeans <- group_by(listDf, N) %>% summarize(meanTime=mean(Measurement_Value))
-  listDf$MeanTime <- sapply(listDf$N, function(n) listMeans[listMeans$N == n,]$meanTime[1])
+  listMeansDf <- group_by(listDf, N) %>% summarize(MeanTime=mean(Measurement_Value))
   
   growthDf <- result %>% filter(Target_Method == "GrowthArray")
   growthDf$N <- sapply(growthDf$Params, function(param) strtoi(gsub("N=", "", param), base = 10))
-  growthMeans <- group_by(growthDf, N) %>% summarize(meanTime=mean(Measurement_Value))
-  growthDf$MeanTime <- sapply(growthDf$N, function(n) growthMeans[growthMeans$N == n,]$meanTime[1])
+  growthMeansDf <- group_by(growthDf, N) %>% summarize(MeanTime=mean(Measurement_Value))
 
   timelinePlot <- ggplot() +
-    xlab("n") +
-    ylab(paste0("Time to append n items (", timeUnit, ")")) +
-    scale_x_log10() +
-    scale_y_log10() +
-    geom_line(data=listDf, aes(x=N, y=MeanTime,color="List")) +
-    geom_point(data=listDf, aes(x=N, y=MeanTime,color="List")) +
-    geom_line(data=growthDf, aes(x=N, y=MeanTime,color="GrowthArray")) +
-    geom_point(data=growthDf, aes(x=N, y=MeanTime,color="GrowthArray"))
+    xlab("N") +
+    ylab(paste0("Average time to append N items (", timeUnit, ")")) +
+    scale_x_continuous(trans='log10', breaks=10^(1:10)) +
+    scale_y_continuous(trans='log10', breaks=10^(1:10)) +
+    geom_line(data=listMeansDf, aes(x=N, y=MeanTime,color="List")) +
+    geom_point(data=listMeansDf, aes(x=N, y=MeanTime,color="List")) +
+    geom_line(data=growthMeansDf, aes(x=N, y=MeanTime,color="GrowthArray")) +
+    geom_point(data=growthMeansDf, aes(x=N, y=MeanTime,color="GrowthArray")) +
+    scale_color_manual(name="Legend", values=c("List"="red","GrowthArray"="blue")) +
+    expand_limits(xlim=c(max(listMeansDf$N, growthMeansDf$N), max(listMeansDf$N, growthMeansDf$N)),
+                  ylim=c(max(listMeansDf$MeanTime, growthMeansDf$MeanTime), max(listMeansDf$MeanTime, growthMeansDf$MeanTime)))
 
   printNice(timelinePlot)
   ggsaveNice(gsub("-measurements.csv", paste0("-timeline.png"), file), timelinePlot)
