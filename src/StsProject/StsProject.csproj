@@ -6,6 +6,10 @@
     <DebugType>full</DebugType> <!-- Needed for code coverage to work. See https://github.com/OpenCover/opencover/issues/601 -->
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Update="Internal\MathHelpers.cs">
       <SubType>Code</SubType>
