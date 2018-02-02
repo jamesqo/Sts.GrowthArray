@@ -24,8 +24,8 @@ namespace StsProject
         private T[] _head;
         private SmallDynamicArray<T[]> _tail; // This is a mutable struct field; do not make it readonly.
         private int _size;
-        private int _hsize;
         private int _capacity;
+        private int _lastCapacity; // Equals (Size - HeadSize) and (Capacity - HeadCapacity).
 
         public GrowthArray()
         {
@@ -36,11 +36,12 @@ namespace StsProject
 
         public int Capacity => _capacity;
 
+        // PERF: Consider _capacity - _lastCapacity.
         public int HeadCapacity => _head.Length;
 
-        public int HeadSize => _hsize;
+        public int HeadSize => _size - _lastCapacity;
 
-        public bool IsFull => _size == Capacity;
+        public bool IsFull => _size == _capacity;
 
         public int NumberOfBuffers => _tail.Size + 1;
 
@@ -49,6 +50,9 @@ namespace StsProject
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Append(T item)
         {
+            // We want to minimize the number of field accesses here, as this is a
+            // hot codepath. 4 field reads and 1 field write is the best I could do it.
+
             // IsFull is inlined so we need not make another field access to _size.
             int size = _size;
             if (size == _capacity)
@@ -56,7 +60,8 @@ namespace StsProject
                 Grow();
             }
 
-            _head[_hsize++] = item;
+            int hsize = size - _lastCapacity;
+            _head[hsize] = item;
             _size = size + 1;
         }
 
@@ -70,7 +75,7 @@ namespace StsProject
                 (GrowthFactor - 1) * InitialCapacity :
                 GrowthFactor * HeadCapacity;
             _head = new T[newHcap];
-            _hsize = 0;
+            _lastCapacity = _capacity;
             _capacity += newHcap;
         }
 
@@ -129,7 +134,7 @@ namespace StsProject
 
             return bufferIndex < _tail.Size ?
                 new BufferSpan<T>(_tail[bufferIndex]) :
-                new BufferSpan<T>(_head, _hsize);
+                new BufferSpan<T>(_head, HeadSize);
         }
 
         public T[] ToRawArray()
@@ -150,7 +155,7 @@ namespace StsProject
                 arrayIndex += buf.Length;
             }
 
-            Array.Copy(_head, 0, array, arrayIndex, _hsize);
+            Array.Copy(_head, 0, array, arrayIndex, HeadSize);
         }
 
         [ExcludeFromCodeCoverage]
