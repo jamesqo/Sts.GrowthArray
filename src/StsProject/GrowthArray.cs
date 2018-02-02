@@ -24,14 +24,16 @@ namespace StsProject
         private SmallDynamicArray<T[]> _tail; // This is a mutable struct field; do not make it readonly.
         private int _size;
         private int _hsize;
+        private int _capacity;
 
         public GrowthArray()
         {
             _head = new T[InitialCapacity];
             _tail = SmallDynamicArray<T[]>.Create();
+            _capacity = InitialCapacity;
         }
 
-        public int Capacity => (_size - _hsize) + HeadCapacity;
+        public int Capacity => _capacity;
 
         public int HeadCapacity => _head.Length;
 
@@ -64,6 +66,7 @@ namespace StsProject
                 GrowthFactor * HeadCapacity;
             _head = new T[newHcap];
             _hsize = 0;
+            _capacity += newHcap;
         }
 
         public ref T this[int index]
