@@ -70,11 +70,13 @@ for (file in files) {
   listDf$N <- sapply(listDf$Params, function(param) strtoi(gsub("N=", "", param), base = 10))
   listMeansDf <- group_by(listDf, N) %>% summarize(MeanTime=mean(Measurement_Value))
   listAllocDf <- group_by(listDf, N) %>% summarize(AllocatedBytes=Allocated_Bytes[1])
+  #print(listAllocDf)
   
   growthDf <- result %>% filter(Target_Method == "GrowthArray")
   growthDf$N <- sapply(growthDf$Params, function(param) strtoi(gsub("N=", "", param), base = 10))
   growthMeansDf <- group_by(growthDf, N) %>% summarize(MeanTime=mean(Measurement_Value))
   growthAllocDf <- group_by(growthDf, N) %>% summarize(AllocatedBytes=Allocated_Bytes[1])
+  #print(growthAllocDf)
 
   timelinePlot <- ggplot() +
     ggtitle("Average Time Needed to Append N Items") +
@@ -99,10 +101,12 @@ for (file in files) {
     ylab("Allocated Bytes") +
     scale_x_continuous(trans='log10', breaks=10^(1:10)) +
     scale_y_continuous(trans='log10', breaks=10^(1:10)) +
-    geom_line(data=listAllocDf, aes(x=N, y=AllocatedBytes,color="red")) +
-    geom_point(data=listAllocDf, aes(x=N, y=AllocatedBytes,color="red")) +
-    geom_line(data=growthAllocDf, aes(x=N, y=AllocatedBytes,color="blue")) +
-    geom_point(data=growthAllocDf, aes(x=N, y=AllocatedBytes,color="blue")) +
+    # TODO: There is a bug in ggplot2 causing it to swap the colors for listAllocDf/growthAllocDf.
+    # https://stackoverflow.com/questions/48575312/have-i-discovered-a-bug-in-ggplot
+    geom_line(data=listAllocDf, aes(x=N, y=AllocatedBytes,color="blue")) +
+    geom_point(data=listAllocDf, aes(x=N, y=AllocatedBytes,color="blue")) +
+    geom_line(data=growthAllocDf, aes(x=N, y=AllocatedBytes,color="red")) +
+    geom_point(data=growthAllocDf, aes(x=N, y=AllocatedBytes,color="red")) +
     scale_color_manual(name="Legend", values=c("red", "blue"), labels=c("List", "GrowthArray"))
     
   printNice(allocationsPlot)
