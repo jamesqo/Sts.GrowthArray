@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using StsProject.Internal;
 using StsProject.Internal.Diagnostics;
 using static StsProject.GrowthArray;
@@ -45,17 +46,21 @@ namespace StsProject
 
         public int Size => _size;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Append(T item)
         {
-            if (IsFull)
+            // IsFull is inlined so we need not make another field access to _size.
+            int size = _size;
+            if (size == _capacity)
             {
                 Grow();
             }
 
             _head[_hsize++] = item;
-            _size++;
+            _size = size + 1;
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         private void Grow()
         {
             Debug.Assert(IsFull);
