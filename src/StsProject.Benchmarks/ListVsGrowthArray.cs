@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Attributes.Exporters;
 using BenchmarkDotNet.Attributes.Jobs;
@@ -7,6 +8,7 @@ namespace StsProject.Benchmarks
 {
     [CoreJob]
     [RPlotExporter]
+    [MemoryDiagnoser] // Measure memory allocations in addition to CPU time
     public class ListVsGrowthArray
     {
         [Params(
@@ -40,6 +42,8 @@ namespace StsProject.Benchmarks
             {
                 collection.Add(null);
             }
+
+            GC.KeepAlive(collection);
         }
 
         [Benchmark]
@@ -50,6 +54,8 @@ namespace StsProject.Benchmarks
             {
                 collection.Append(null);
             }
+
+            GC.KeepAlive(collection);
         }
     }
 }

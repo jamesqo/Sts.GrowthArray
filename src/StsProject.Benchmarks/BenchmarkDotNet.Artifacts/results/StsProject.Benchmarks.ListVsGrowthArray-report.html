@@ -24,16 +24,16 @@ Frequency=2648438 Hz, Resolution=377.5810 ns, Timer=TSC
 </code></pre>
 
 <table>
-<thead><tr><th>Method</th><th>N</th><th>  Mean</th><th>  Error</th><th> StdDev</th><th>Median</th>
+<thead><tr><th>Method</th><th>N</th><th>  Mean</th><th> Error</th><th> StdDev</th><th>Gen 0</th><th>Gen 1</th><th>Gen 2</th><th>Allocated</th>
 </tr>
-</thead><tbody><tr><td>List</td><td>10</td><td>127.8 ns</td><td>1.922 ns</td><td>1.605 ns</td><td>127.6 ns</td>
-</tr><tr><td>GrowthArray</td><td>10</td><td>138.7 ns</td><td>1.744 ns</td><td>1.632 ns</td><td>138.8 ns</td>
-</tr><tr><td>List</td><td>250</td><td>1,085.3 ns</td><td>26.613 ns</td><td>75.929 ns</td><td>1,058.0 ns</td>
-</tr><tr><td>GrowthArray</td><td>250</td><td>2,255.3 ns</td><td>44.470 ns</td><td>59.366 ns</td><td>2,232.4 ns</td>
-</tr><tr><td>List</td><td>5000</td><td>23,933.5 ns</td><td>774.668 ns</td><td>2,133.661 ns</td><td>23,184.6 ns</td>
-</tr><tr><td>GrowthArray</td><td>5000</td><td>40,788.9 ns</td><td>775.484 ns</td><td>761.629 ns</td><td>40,696.9 ns</td>
-</tr><tr><td>List</td><td>49152</td><td>410,341.9 ns</td><td>10,511.812 ns</td><td>29,476.248 ns</td><td>404,218.7 ns</td>
-</tr><tr><td>GrowthArray</td><td>49152</td><td>458,069.1 ns</td><td>10,220.751 ns</td><td>29,325.252 ns</td><td>446,726.6 ns</td>
+</thead><tbody><tr><td>List</td><td>10</td><td>129.7 ns</td><td>1.990 ns</td><td>1.862 ns</td><td>0.2134</td><td>-</td><td>-</td><td>336 B</td>
+</tr><tr><td>GrowthArray</td><td>10</td><td>142.5 ns</td><td>1.746 ns</td><td>1.548 ns</td><td>0.1779</td><td>-</td><td>-</td><td>280 B</td>
+</tr><tr><td>List</td><td>250</td><td>1,057.5 ns</td><td>20.738 ns</td><td>21.297 ns</td><td>2.7122</td><td>-</td><td>-</td><td>4272 B</td>
+</tr><tr><td>GrowthArray</td><td>250</td><td>2,235.7 ns</td><td>12.115 ns</td><td>10.740 ns</td><td>1.5144</td><td>-</td><td>-</td><td>2384 B</td>
+</tr><tr><td>List</td><td>5000</td><td>21,855.9 ns</td><td>325.262 ns</td><td>304.250 ns</td><td>83.3130</td><td>-</td><td>-</td><td>131368 B</td>
+</tr><tr><td>GrowthArray</td><td>5000</td><td>40,337.3 ns</td><td>399.101 ns</td><td>353.792 ns</td><td>41.6260</td><td>-</td><td>-</td><td>66144 B</td>
+</tr><tr><td>List</td><td>49152</td><td>389,233.3 ns</td><td>4,419.481 ns</td><td>4,133.985 ns</td><td>285.6445</td><td>285.6445</td><td>285.6445</td><td>1048944 B</td>
+</tr><tr><td>GrowthArray</td><td>49152</td><td>448,520.2 ns</td><td>9,589.232 ns</td><td>16,794.766 ns</td><td>124.5117</td><td>124.5117</td><td>124.5117</td><td>524968 B</td>
 </tr></tbody></table>
 </body>
 </html>

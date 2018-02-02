@@ -69,24 +69,42 @@ for (file in files) {
   listDf <- result %>% filter(Target_Method == "List")
   listDf$N <- sapply(listDf$Params, function(param) strtoi(gsub("N=", "", param), base = 10))
   listMeansDf <- group_by(listDf, N) %>% summarize(MeanTime=mean(Measurement_Value))
+  listAllocDf <- group_by(listDf, N) %>% summarize(AllocatedBytes=Allocated_Bytes[1])
   
   growthDf <- result %>% filter(Target_Method == "GrowthArray")
   growthDf$N <- sapply(growthDf$Params, function(param) strtoi(gsub("N=", "", param), base = 10))
   growthMeansDf <- group_by(growthDf, N) %>% summarize(MeanTime=mean(Measurement_Value))
+  growthAllocDf <- group_by(growthDf, N) %>% summarize(AllocatedBytes=Allocated_Bytes[1])
 
   timelinePlot <- ggplot() +
+    ggtitle("Average Time Needed to Append N Items") +
+    theme(plot.title = element_text(hjust = 0.5)) +
     xlab("N") +
-    ylab(paste0("Average time to append N items (", timeUnit, ")")) +
+    ylab(paste0("Average Time (", timeUnit, ")")) +
     scale_x_continuous(trans='log10', breaks=10^(1:10)) +
     scale_y_continuous(trans='log10', breaks=10^(1:10)) +
-    geom_line(data=listMeansDf, aes(x=N, y=MeanTime,color="List")) +
-    geom_point(data=listMeansDf, aes(x=N, y=MeanTime,color="List")) +
-    geom_line(data=growthMeansDf, aes(x=N, y=MeanTime,color="GrowthArray")) +
-    geom_point(data=growthMeansDf, aes(x=N, y=MeanTime,color="GrowthArray")) +
-    scale_color_manual(name="Legend", values=c("List"="red","GrowthArray"="blue")) +
-    expand_limits(xlim=c(max(listMeansDf$N, growthMeansDf$N), max(listMeansDf$N, growthMeansDf$N)),
-                  ylim=c(max(listMeansDf$MeanTime, growthMeansDf$MeanTime), max(listMeansDf$MeanTime, growthMeansDf$MeanTime)))
+    geom_line(data=listMeansDf, aes(x=N, y=MeanTime,color="red")) +
+    geom_point(data=listMeansDf, aes(x=N, y=MeanTime,color="red")) +
+    geom_line(data=growthMeansDf, aes(x=N, y=MeanTime,color="blue")) +
+    geom_point(data=growthMeansDf, aes(x=N, y=MeanTime,color="blue")) +
+    scale_color_manual(name="Legend", values=c("red", "blue"), labels=c("List", "GrowthArray"))
 
   printNice(timelinePlot)
   ggsaveNice(gsub("-measurements.csv", paste0("-timeline.png"), file), timelinePlot)
+
+  allocationsPlot <- ggplot() +
+    ggtitle("Space Needed to Append N Items") +
+    theme(plot.title = element_text(hjust = 0.5)) +
+    xlab("N") +
+    ylab("Allocated Bytes") +
+    scale_x_continuous(trans='log10', breaks=10^(1:10)) +
+    scale_y_continuous(trans='log10', breaks=10^(1:10)) +
+    geom_line(data=listAllocDf, aes(x=N, y=AllocatedBytes,color="red")) +
+    geom_point(data=listAllocDf, aes(x=N, y=AllocatedBytes,color="red")) +
+    geom_line(data=growthAllocDf, aes(x=N, y=AllocatedBytes,color="blue")) +
+    geom_point(data=growthAllocDf, aes(x=N, y=AllocatedBytes,color="blue")) +
+    scale_color_manual(name="Legend", values=c("red", "blue"), labels=c("List", "GrowthArray"))
+    
+  printNice(allocationsPlot)
+  ggsaveNice(gsub("-measurements.csv", paste0("-allocations.png"), file), allocationsPlot)
 }
