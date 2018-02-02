@@ -60,6 +60,7 @@ namespace StsProject
                 Grow();
             }
 
+            // HeadSize is also inlined.
             int hsize = size - _lastCapacity;
             _head[hsize] = item;
             _size = size + 1;
