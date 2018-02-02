@@ -4,9 +4,6 @@
     <TargetFramework>netstandard1.4</TargetFramework>
     <RootNamespace>StsProject</RootNamespace>
     <DebugType>full</DebugType> <!-- Needed for code coverage to work. See https://github.com/OpenCover/opencover/issues/601 -->
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <Optimize>true</Optimize>
   </PropertyGroup>
 
