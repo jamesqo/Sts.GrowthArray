@@ -85,11 +85,14 @@ for (file in files) {
     ylab(paste0("Average Time (", timeUnit, ")")) +
     scale_x_continuous(trans='log10', breaks=10^(1:10)) +
     scale_y_continuous(trans='log10', breaks=10^(1:10)) +
-    geom_line(data=listMeansDf, aes(x=N, y=MeanTime,color="red")) +
-    geom_point(data=listMeansDf, aes(x=N, y=MeanTime,color="red")) +
-    geom_line(data=growthMeansDf, aes(x=N, y=MeanTime,color="blue")) +
-    geom_point(data=growthMeansDf, aes(x=N, y=MeanTime,color="blue")) +
-    scale_color_manual(name="Legend", values=c("red", "blue"), labels=c("List", "GrowthArray"))
+    geom_line(data=listMeansDf, aes(x=N, y=MeanTime,color="List")) +
+    geom_point(data=listMeansDf, aes(x=N, y=MeanTime,color="List")) +
+    geom_line(data=growthMeansDf, aes(x=N, y=MeanTime,color="GrowthArray")) +
+    geom_point(data=growthMeansDf, aes(x=N, y=MeanTime,color="GrowthArray")) +
+    scale_color_manual(name="Legend",
+                       values=c("List"="red", "GrowthArray"="blue"),
+                       breaks=c("List", "GrowthArray"),
+                       labels=c("List", "GrowthArray"))
 
   printNice(timelinePlot)
   ggsaveNice(gsub("-measurements.csv", paste0("-timeline.png"), file), timelinePlot)
@@ -101,13 +104,14 @@ for (file in files) {
     ylab("Allocated Bytes") +
     scale_x_continuous(trans='log10', breaks=10^(1:10)) +
     scale_y_continuous(trans='log10', breaks=10^(1:10)) +
-    # TODO: There is a bug in ggplot2 causing it to swap the colors for listAllocDf/growthAllocDf.
-    # https://stackoverflow.com/questions/48575312/have-i-discovered-a-bug-in-ggplot
-    geom_line(data=listAllocDf, aes(x=N, y=AllocatedBytes,color="blue")) +
-    geom_point(data=listAllocDf, aes(x=N, y=AllocatedBytes,color="blue")) +
-    geom_line(data=growthAllocDf, aes(x=N, y=AllocatedBytes,color="red")) +
-    geom_point(data=growthAllocDf, aes(x=N, y=AllocatedBytes,color="red")) +
-    scale_color_manual(name="Legend", values=c("red", "blue"), labels=c("List", "GrowthArray"))
+    geom_line(data=listAllocDf, aes(x=N, y=AllocatedBytes,color="List")) +
+    geom_point(data=listAllocDf, aes(x=N, y=AllocatedBytes,color="List")) +
+    geom_line(data=growthAllocDf, aes(x=N, y=AllocatedBytes,color="GrowthArray")) +
+    geom_point(data=growthAllocDf, aes(x=N, y=AllocatedBytes,color="GrowthArray")) +
+    scale_color_manual(name="Legend",
+                       values=c("List"="red", "GrowthArray"="blue"),
+                       breaks=c("List", "GrowthArray"),
+                       labels=c("List", "GrowthArray"))
     
   printNice(allocationsPlot)
   ggsaveNice(gsub("-measurements.csv", paste0("-allocations.png"), file), allocationsPlot)
