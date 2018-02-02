@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="ListVsGrowthArray.cs">
+    <Compile Update="ListVsGrowthArray_Append.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
