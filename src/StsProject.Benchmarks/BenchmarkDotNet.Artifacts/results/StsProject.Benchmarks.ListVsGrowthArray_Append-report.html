@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>ListVsGrowthArray_Append</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet=v0.10.12, OS=Windows 10 Redstone 1 [1607, Anniversary Update] (10.0.14393.1198)
+Intel Core i5-4460T CPU 1.90GHz (Haswell), 1 CPU, 4 logical cores and 4 physical cores
+Frequency=1851191 Hz, Resolution=540.1928 ns, Timer=TSC
+.NET Core SDK=2.1.4
+  [Host] : .NET Core 2.0.5 (Framework 4.6.26020.03), 64bit RyuJIT
+  Core   : .NET Core 2.0.5 (Framework 4.6.26020.03), 64bit RyuJIT
+</code></pre>
+<pre><code>Job=Core  Runtime=Core  
+</code></pre>
+
+<table>
+<thead><tr><th>Method</th><th>N</th><th>   Mean</th><th>  Error</th><th> StdDev</th><th> Median</th><th>Gen 0</th><th>Gen 1</th><th>Gen 2</th><th>Allocated</th>
+</tr>
+</thead><tbody><tr><td>List</td><td>1</td><td>32.64 ns</td><td>0.2942 ns</td><td>0.2752 ns</td><td>32.67 ns</td><td>0.0305</td><td>-</td><td>-</td><td>96 B</td>
+</tr><tr><td>GrowthArray</td><td>1</td><td>44.72 ns</td><td>0.1888 ns</td><td>0.1674 ns</td><td>44.71 ns</td><td>0.0432</td><td>-</td><td>-</td><td>136 B</td>
+</tr><tr><td>List</td><td>2</td><td>36.37 ns</td><td>0.1886 ns</td><td>0.1672 ns</td><td>36.36 ns</td><td>0.0305</td><td>-</td><td>-</td><td>96 B</td>
+</tr><tr><td>GrowthArray</td><td>2</td><td>48.68 ns</td><td>0.1823 ns</td><td>0.1522 ns</td><td>48.64 ns</td><td>0.0432</td><td>-</td><td>-</td><td>136 B</td>
+</tr><tr><td>List</td><td>3</td><td>37.23 ns</td><td>0.1245 ns</td><td>0.1040 ns</td><td>37.24 ns</td><td>0.0305</td><td>-</td><td>-</td><td>96 B</td>
+</tr><tr><td>GrowthArray</td><td>3</td><td>55.17 ns</td><td>0.3022 ns</td><td>0.2679 ns</td><td>55.09 ns</td><td>0.0432</td><td>-</td><td>-</td><td>136 B</td>
+</tr><tr><td>List</td><td>4</td><td>39.78 ns</td><td>0.8215 ns</td><td>0.8068 ns</td><td>39.67 ns</td><td>0.0305</td><td>-</td><td>-</td><td>96 B</td>
+</tr><tr><td>GrowthArray</td><td>4</td><td>66.09 ns</td><td>0.3504 ns</td><td>0.3277 ns</td><td>65.98 ns</td><td>0.0432</td><td>-</td><td>-</td><td>136 B</td>
+</tr><tr><td>List</td><td>5</td><td>92.48 ns</td><td>0.4585 ns</td><td>0.4289 ns</td><td>92.47 ns</td><td>0.0584</td><td>-</td><td>-</td><td>184 B</td>
+</tr><tr><td>GrowthArray</td><td>5</td><td>76.11 ns</td><td>0.2618 ns</td><td>0.2448 ns</td><td>76.06 ns</td><td>0.0432</td><td>-</td><td>-</td><td>136 B</td>
+</tr><tr><td>List</td><td>6</td><td>94.05 ns</td><td>1.4336 ns</td><td>1.2708 ns</td><td>93.98 ns</td><td>0.0584</td><td>-</td><td>-</td><td>184 B</td>
+</tr><tr><td>GrowthArray</td><td>6</td><td>86.48 ns</td><td>1.7451 ns</td><td>2.9156 ns</td><td>86.24 ns</td><td>0.0432</td><td>-</td><td>-</td><td>136 B</td>
+</tr><tr><td>List</td><td>7</td><td>96.23 ns</td><td>0.3337 ns</td><td>0.2787 ns</td><td>96.25 ns</td><td>0.0584</td><td>-</td><td>-</td><td>184 B</td>
+</tr><tr><td>GrowthArray</td><td>7</td><td>92.80 ns</td><td>1.4392 ns</td><td>1.3462 ns</td><td>92.86 ns</td><td>0.0432</td><td>-</td><td>-</td><td>136 B</td>
+</tr><tr><td>List</td><td>8</td><td>103.91 ns</td><td>2.4239 ns</td><td>2.1488 ns</td><td>103.89 ns</td><td>0.0584</td><td>-</td><td>-</td><td>184 B</td>
+</tr><tr><td>GrowthArray</td><td>8</td><td>96.63 ns</td><td>1.9653 ns</td><td>2.5554 ns</td><td>96.77 ns</td><td>0.0432</td><td>-</td><td>-</td><td>136 B</td>
+</tr><tr><td>List</td><td>9</td><td>163.95 ns</td><td>1.5123 ns</td><td>1.4146 ns</td><td>163.78 ns</td><td>0.1066</td><td>-</td><td>-</td><td>336 B</td>
+</tr><tr><td>GrowthArray</td><td>9</td><td>158.94 ns</td><td>2.6361 ns</td><td>2.4658 ns</td><td>159.03 ns</td><td>0.0889</td><td>-</td><td>-</td><td>280 B</td>
+</tr><tr><td>List</td><td>10</td><td>162.36 ns</td><td>3.2138 ns</td><td>4.7108 ns</td><td>161.42 ns</td><td>0.1066</td><td>-</td><td>-</td><td>336 B</td>
+</tr><tr><td>GrowthArray</td><td>10</td><td>154.98 ns</td><td>1.0682 ns</td><td>0.9992 ns</td><td>155.10 ns</td><td>0.0889</td><td>-</td><td>-</td><td>280 B</td>
+</tr><tr><td>List</td><td>16</td><td>171.76 ns</td><td>2.2746 ns</td><td>2.1277 ns</td><td>171.56 ns</td><td>0.1066</td><td>-</td><td>-</td><td>336 B</td>
+</tr><tr><td>GrowthArray</td><td>16</td><td>194.89 ns</td><td>2.8279 ns</td><td>2.6452 ns</td><td>194.85 ns</td><td>0.0889</td><td>-</td><td>-</td><td>280 B</td>
+</tr><tr><td>List</td><td>17</td><td>259.00 ns</td><td>5.1958 ns</td><td>13.9581 ns</td><td>257.59 ns</td><td>0.1955</td><td>-</td><td>-</td><td>616 B</td>
+</tr><tr><td>GrowthArray</td><td>17</td><td>284.61 ns</td><td>5.6997 ns</td><td>9.3648 ns</td><td>286.56 ns</td><td>0.1369</td><td>-</td><td>-</td><td>432 B</td>
+</tr><tr><td>List</td><td>24</td><td>279.16 ns</td><td>5.6090 ns</td><td>14.2768 ns</td><td>281.65 ns</td><td>0.1955</td><td>-</td><td>-</td><td>616 B</td>
+</tr><tr><td>GrowthArray</td><td>24</td><td>316.19 ns</td><td>3.2413 ns</td><td>3.0319 ns</td><td>316.20 ns</td><td>0.1369</td><td>-</td><td>-</td><td>432 B</td>
+</tr><tr><td>List</td><td>25</td><td>267.21 ns</td><td>2.3436 ns</td><td>2.1922 ns</td><td>267.67 ns</td><td>0.1955</td><td>-</td><td>-</td><td>616 B</td>
+</tr><tr><td>GrowthArray</td><td>25</td><td>337.83 ns</td><td>4.0691 ns</td><td>3.8062 ns</td><td>337.89 ns</td><td>0.1369</td><td>-</td><td>-</td><td>432 B</td>
+</tr><tr><td>List</td><td>32</td><td>290.12 ns</td><td>5.6123 ns</td><td>5.7634 ns</td><td>292.80 ns</td><td>0.1955</td><td>-</td><td>-</td><td>616 B</td>
+</tr><tr><td>GrowthArray</td><td>32</td><td>450.82 ns</td><td>6.5616 ns</td><td>6.1377 ns</td><td>453.52 ns</td><td>0.1369</td><td>-</td><td>-</td><td>432 B</td>
+</tr><tr><td>List</td><td>33</td><td>387.61 ns</td><td>8.4378 ns</td><td>16.6554 ns</td><td>380.67 ns</td><td>0.3657</td><td>-</td><td>-</td><td>1152 B</td>
+</tr><tr><td>GrowthArray</td><td>33</td><td>484.82 ns</td><td>4.4831 ns</td><td>4.1935 ns</td><td>484.53 ns</td><td>0.2260</td><td>-</td><td>-</td><td>712 B</td>
+</tr><tr><td>List</td><td>48</td><td>426.09 ns</td><td>3.4600 ns</td><td>3.2365 ns</td><td>427.33 ns</td><td>0.3657</td><td>-</td><td>-</td><td>1152 B</td>
+</tr><tr><td>GrowthArray</td><td>48</td><td>617.88 ns</td><td>4.5225 ns</td><td>4.0091 ns</td><td>616.91 ns</td><td>0.2260</td><td>-</td><td>-</td><td>712 B</td>
+</tr><tr><td>List</td><td>50</td><td>412.25 ns</td><td>6.4741 ns</td><td>6.0559 ns</td><td>414.08 ns</td><td>0.3657</td><td>-</td><td>-</td><td>1152 B</td>
+</tr><tr><td>GrowthArray</td><td>50</td><td>629.86 ns</td><td>6.4145 ns</td><td>5.3564 ns</td><td>630.07 ns</td><td>0.2260</td><td>-</td><td>-</td><td>712 B</td>
+</tr><tr><td>List</td><td>64</td><td>473.19 ns</td><td>8.8988 ns</td><td>8.3239 ns</td><td>472.67 ns</td><td>0.3657</td><td>-</td><td>-</td><td>1152 B</td>
+</tr><tr><td>GrowthArray</td><td>64</td><td>725.40 ns</td><td>14.5504 ns</td><td>19.9167 ns</td><td>718.35 ns</td><td>0.2260</td><td>-</td><td>-</td><td>712 B</td>
+</tr><tr><td>List</td><td>65</td><td>788.88 ns</td><td>15.6094 ns</td><td>31.1737 ns</td><td>778.53 ns</td><td>0.6990</td><td>-</td><td>-</td><td>2200 B</td>
+</tr><tr><td>GrowthArray</td><td>65</td><td>822.02 ns</td><td>15.9977 ns</td><td>19.6466 ns</td><td>824.88 ns</td><td>0.3958</td><td>-</td><td>-</td><td>1248 B</td>
+</tr><tr><td>List</td><td>96</td><td>703.84 ns</td><td>7.5272 ns</td><td>6.6726 ns</td><td>702.87 ns</td><td>0.6990</td><td>-</td><td>-</td><td>2200 B</td>
+</tr><tr><td>GrowthArray</td><td>96</td><td>1,025.88 ns</td><td>11.5150 ns</td><td>10.7712 ns</td><td>1,026.47 ns</td><td>0.3948</td><td>-</td><td>-</td><td>1248 B</td>
+</tr><tr><td>List</td><td>100</td><td>710.09 ns</td><td>6.7255 ns</td><td>6.2910 ns</td><td>709.10 ns</td><td>0.6990</td><td>-</td><td>-</td><td>2200 B</td>
+</tr><tr><td>GrowthArray</td><td>100</td><td>1,047.57 ns</td><td>7.1122 ns</td><td>6.6527 ns</td><td>1,050.05 ns</td><td>0.3948</td><td>-</td><td>-</td><td>1248 B</td>
+</tr><tr><td>List</td><td>128</td><td>784.11 ns</td><td>7.5278 ns</td><td>7.0415 ns</td><td>783.83 ns</td><td>0.6990</td><td>-</td><td>-</td><td>2200 B</td>
+</tr><tr><td>GrowthArray</td><td>128</td><td>1,262.96 ns</td><td>10.3503 ns</td><td>9.1752 ns</td><td>1,265.64 ns</td><td>0.3948</td><td>-</td><td>-</td><td>1248 B</td>
+</tr><tr><td>List</td><td>129</td><td>1,210.09 ns</td><td>22.8021 ns</td><td>21.3291 ns</td><td>1,208.76 ns</td><td>1.3561</td><td>-</td><td>-</td><td>4272 B</td>
+</tr><tr><td>GrowthArray</td><td>129</td><td>1,425.39 ns</td><td>11.2576 ns</td><td>10.5303 ns</td><td>1,429.81 ns</td><td>0.7572</td><td>-</td><td>-</td><td>2384 B</td>
+</tr><tr><td>List</td><td>192</td><td>1,189.49 ns</td><td>9.4624 ns</td><td>8.8511 ns</td><td>1,189.03 ns</td><td>1.3561</td><td>-</td><td>-</td><td>4272 B</td>
+</tr><tr><td>GrowthArray</td><td>192</td><td>1,907.07 ns</td><td>18.3003 ns</td><td>17.1181 ns</td><td>1,900.48 ns</td><td>0.7572</td><td>-</td><td>-</td><td>2384 B</td>
+</tr><tr><td>List</td><td>250</td><td>1,365.95 ns</td><td>23.1152 ns</td><td>21.6220 ns</td><td>1,362.18 ns</td><td>1.3561</td><td>-</td><td>-</td><td>4272 B</td>
+</tr><tr><td>GrowthArray</td><td>250</td><td>2,340.05 ns</td><td>34.5990 ns</td><td>32.3639 ns</td><td>2,337.04 ns</td><td>0.7553</td><td>-</td><td>-</td><td>2384 B</td>
+</tr><tr><td>List</td><td>256</td><td>1,368.03 ns</td><td>24.0781 ns</td><td>22.5227 ns</td><td>1,366.72 ns</td><td>1.3561</td><td>-</td><td>-</td><td>4272 B</td>
+</tr><tr><td>GrowthArray</td><td>256</td><td>2,428.17 ns</td><td>46.9967 ns</td><td>62.7393 ns</td><td>2,414.63 ns</td><td>0.7553</td><td>-</td><td>-</td><td>2384 B</td>
+</tr><tr><td>List</td><td>257</td><td>2,126.53 ns</td><td>42.5478 ns</td><td>98.6111 ns</td><td>2,099.54 ns</td><td>2.6665</td><td>-</td><td>-</td><td>8392 B</td>
+</tr><tr><td>GrowthArray</td><td>257</td><td>2,458.62 ns</td><td>42.1443 ns</td><td>39.4218 ns</td><td>2,433.97 ns</td><td>1.4153</td><td>-</td><td>-</td><td>4456 B</td>
+</tr><tr><td>List</td><td>384</td><td>2,269.75 ns</td><td>45.0447 ns</td><td>76.4893 ns</td><td>2,263.33 ns</td><td>2.6665</td><td>-</td><td>-</td><td>8392 B</td>
+</tr><tr><td>GrowthArray</td><td>384</td><td>3,555.74 ns</td><td>45.7276 ns</td><td>35.7011 ns</td><td>3,555.69 ns</td><td>1.4153</td><td>-</td><td>-</td><td>4456 B</td>
+</tr><tr><td>List</td><td>500</td><td>2,457.42 ns</td><td>36.6938 ns</td><td>32.5281 ns</td><td>2,457.05 ns</td><td>2.6665</td><td>-</td><td>-</td><td>8392 B</td>
+</tr><tr><td>GrowthArray</td><td>500</td><td>4,171.79 ns</td><td>52.1641 ns</td><td>46.2421 ns</td><td>4,180.95 ns</td><td>1.4114</td><td>-</td><td>-</td><td>4456 B</td>
+</tr><tr><td>List</td><td>512</td><td>2,463.55 ns</td><td>6.6893 ns</td><td>5.9299 ns</td><td>2,463.47 ns</td><td>2.6665</td><td>-</td><td>-</td><td>8392 B</td>
+</tr><tr><td>GrowthArray</td><td>512</td><td>4,218.12 ns</td><td>30.6463 ns</td><td>28.6666 ns</td><td>4,215.75 ns</td><td>1.4114</td><td>-</td><td>-</td><td>4456 B</td>
+</tr><tr><td>List</td><td>513</td><td>3,590.52 ns</td><td>20.9639 ns</td><td>19.6096 ns</td><td>3,589.25 ns</td><td>5.2681</td><td>-</td><td>-</td><td>16608 B</td>
+</tr><tr><td>GrowthArray</td><td>513</td><td>4,966.74 ns</td><td>97.3764 ns</td><td>178.0583 ns</td><td>5,035.49 ns</td><td>2.7237</td><td>-</td><td>-</td><td>8576 B</td>
+</tr><tr><td>List</td><td>768</td><td>4,543.57 ns</td><td>90.9138 ns</td><td>205.2076 ns</td><td>4,589.94 ns</td><td>5.2643</td><td>-</td><td>-</td><td>16608 B</td>
+</tr><tr><td>GrowthArray</td><td>768</td><td>6,742.10 ns</td><td>134.3659 ns</td><td>196.9519 ns</td><td>6,718.53 ns</td><td>2.7237</td><td>-</td><td>-</td><td>8576 B</td>
+</tr><tr><td>List</td><td>1000</td><td>4,758.62 ns</td><td>49.2462 ns</td><td>46.0649 ns</td><td>4,756.08 ns</td><td>5.2643</td><td>-</td><td>-</td><td>16608 B</td>
+</tr><tr><td>GrowthArray</td><td>1000</td><td>8,310.11 ns</td><td>78.1186 ns</td><td>69.2501 ns</td><td>8,319.70 ns</td><td>2.7161</td><td>-</td><td>-</td><td>8576 B</td>
+</tr><tr><td>List</td><td>1024</td><td>4,985.80 ns</td><td>74.8105 ns</td><td>69.9778 ns</td><td>4,992.23 ns</td><td>5.2643</td><td>-</td><td>-</td><td>16608 B</td>
+</tr><tr><td>GrowthArray</td><td>1024</td><td>8,720.95 ns</td><td>104.9252 ns</td><td>98.1470 ns</td><td>8,750.68 ns</td><td>2.7161</td><td>-</td><td>-</td><td>8576 B</td>
+</tr><tr><td>List</td><td>1025</td><td>6,867.99 ns</td><td>119.0781 ns</td><td>111.3857 ns</td><td>6,844.13 ns</td><td>10.4675</td><td>-</td><td>-</td><td>33016 B</td>
+</tr><tr><td>GrowthArray</td><td>1025</td><td>9,151.69 ns</td><td>113.5934 ns</td><td>106.2554 ns</td><td>9,131.55 ns</td><td>5.3253</td><td>-</td><td>-</td><td>16792 B</td>
+</tr><tr><td>List</td><td>1536</td><td>7,854.81 ns</td><td>114.0400 ns</td><td>106.6731 ns</td><td>7,860.74 ns</td><td>10.4675</td><td>-</td><td>-</td><td>33016 B</td>
+</tr><tr><td>GrowthArray</td><td>1536</td><td>12,837.05 ns</td><td>192.6935 ns</td><td>180.2456 ns</td><td>12,882.62 ns</td><td>5.3253</td><td>-</td><td>-</td><td>16792 B</td>
+</tr><tr><td>List</td><td>2048</td><td>9,109.74 ns</td><td>59.3536 ns</td><td>55.5194 ns</td><td>9,101.95 ns</td><td>10.4675</td><td>-</td><td>-</td><td>33016 B</td>
+</tr><tr><td>GrowthArray</td><td>2048</td><td>16,537.91 ns</td><td>308.6613 ns</td><td>288.7219 ns</td><td>16,581.96 ns</td><td>5.3101</td><td>-</td><td>-</td><td>16792 B</td>
+</tr><tr><td>List</td><td>2049</td><td>13,551.66 ns</td><td>166.1359 ns</td><td>155.4037 ns</td><td>13,580.81 ns</td><td>20.8282</td><td>-</td><td>-</td><td>65808 B</td>
+</tr><tr><td>GrowthArray</td><td>2049</td><td>17,579.92 ns</td><td>126.2900 ns</td><td>105.4578 ns</td><td>17,586.85 ns</td><td>10.5591</td><td>-</td><td>-</td><td>33352 B</td>
+</tr><tr><td>List</td><td>2500</td><td>14,450.26 ns</td><td>120.1826 ns</td><td>106.5388 ns</td><td>14,421.11 ns</td><td>20.8282</td><td>-</td><td>-</td><td>65808 B</td>
+</tr><tr><td>GrowthArray</td><td>2500</td><td>20,912.44 ns</td><td>129.6351 ns</td><td>121.2607 ns</td><td>20,876.37 ns</td><td>10.5591</td><td>-</td><td>-</td><td>33352 B</td>
+</tr><tr><td>List</td><td>3072</td><td>16,190.00 ns</td><td>206.7093 ns</td><td>193.3560 ns</td><td>16,204.05 ns</td><td>20.8130</td><td>-</td><td>-</td><td>65808 B</td>
+</tr><tr><td>GrowthArray</td><td>3072</td><td>25,215.87 ns</td><td>222.3414 ns</td><td>207.9783 ns</td><td>25,198.46 ns</td><td>10.5591</td><td>-</td><td>-</td><td>33352 B</td>
+</tr><tr><td>List</td><td>4096</td><td>18,862.95 ns</td><td>229.8474 ns</td><td>214.9994 ns</td><td>18,876.14 ns</td><td>20.8130</td><td>-</td><td>-</td><td>65808 B</td>
+</tr><tr><td>GrowthArray</td><td>4096</td><td>31,591.40 ns</td><td>524.0608 ns</td><td>490.2068 ns</td><td>31,719.11 ns</td><td>10.5591</td><td>-</td><td>-</td><td>33352 B</td>
+</tr><tr><td>List</td><td>4097</td><td>27,052.68 ns</td><td>340.3639 ns</td><td>284.2193 ns</td><td>27,046.23 ns</td><td>41.6565</td><td>-</td><td>-</td><td>131368 B</td>
+</tr><tr><td>GrowthArray</td><td>4097</td><td>34,820.29 ns</td><td>544.7203 ns</td><td>509.5317 ns</td><td>34,700.40 ns</td><td>20.8130</td><td>-</td><td>-</td><td>66144 B</td>
+</tr><tr><td>List</td><td>5000</td><td>29,009.66 ns</td><td>312.8874 ns</td><td>292.6750 ns</td><td>28,980.57 ns</td><td>41.6565</td><td>-</td><td>-</td><td>131368 B</td>
+</tr><tr><td>GrowthArray</td><td>5000</td><td>41,142.03 ns</td><td>414.8519 ns</td><td>388.0527 ns</td><td>41,228.40 ns</td><td>20.8130</td><td>-</td><td>-</td><td>66144 B</td>
+</tr><tr><td>List</td><td>6144</td><td>32,453.48 ns</td><td>278.9450 ns</td><td>247.2775 ns</td><td>32,480.00 ns</td><td>41.6260</td><td>-</td><td>-</td><td>131368 B</td>
+</tr><tr><td>GrowthArray</td><td>6144</td><td>49,391.94 ns</td><td>296.2521 ns</td><td>277.1144 ns</td><td>49,430.85 ns</td><td>20.8130</td><td>-</td><td>-</td><td>66144 B</td>
+</tr><tr><td>List</td><td>8192</td><td>38,020.81 ns</td><td>406.2960 ns</td><td>380.0495 ns</td><td>38,099.34 ns</td><td>41.6260</td><td>-</td><td>-</td><td>131368 B</td>
+</tr><tr><td>GrowthArray</td><td>8192</td><td>67,053.76 ns</td><td>983.1861 ns</td><td>871.5687 ns</td><td>67,093.59 ns</td><td>20.7520</td><td>-</td><td>-</td><td>66144 B</td>
+</tr><tr><td>List</td><td>8193</td><td>81,249.11 ns</td><td>1,629.7003 ns</td><td>2,488.7245 ns</td><td>82,106.83 ns</td><td>41.6260</td><td>41.6260</td><td>41.6260</td><td>262464 B</td>
+</tr><tr><td>GrowthArray</td><td>8193</td><td>67,490.20 ns</td><td>1,070.3477 ns</td><td>1,001.2038 ns</td><td>67,235.79 ns</td><td>41.6260</td><td>-</td><td>-</td><td>131704 B</td>
+</tr><tr><td>List</td><td>10000</td><td>82,300.91 ns</td><td>1,181.8099 ns</td><td>986.8647 ns</td><td>82,547.83 ns</td><td>41.6260</td><td>41.6260</td><td>41.6260</td><td>262464 B</td>
+</tr><tr><td>GrowthArray</td><td>10000</td><td>81,736.17 ns</td><td>1,599.1442 ns</td><td>1,711.0662 ns</td><td>81,324.00 ns</td><td>41.6260</td><td>-</td><td>-</td><td>131704 B</td>
+</tr><tr><td>List</td><td>12288</td><td>93,464.63 ns</td><td>1,860.4088 ns</td><td>1,990.6164 ns</td><td>93,783.33 ns</td><td>41.6260</td><td>41.6260</td><td>41.6260</td><td>262464 B</td>
+</tr><tr><td>GrowthArray</td><td>12288</td><td>96,781.28 ns</td><td>1,625.7824 ns</td><td>1,441.2136 ns</td><td>96,667.05 ns</td><td>41.6260</td><td>-</td><td>-</td><td>131704 B</td>
+</tr><tr><td>List</td><td>16384</td><td>114,117.31 ns</td><td>2,105.0760 ns</td><td>1,969.0892 ns</td><td>114,438.38 ns</td><td>41.6260</td><td>41.6260</td><td>41.6260</td><td>262464 B</td>
+</tr><tr><td>GrowthArray</td><td>16384</td><td>126,012.46 ns</td><td>2,617.6117 ns</td><td>4,075.3060 ns</td><td>125,135.80 ns</td><td>41.5039</td><td>-</td><td>-</td><td>131704 B</td>
+</tr><tr><td>List</td><td>16385</td><td>185,932.20 ns</td><td>3,386.0782 ns</td><td>3,001.6699 ns</td><td>185,095.34 ns</td><td>124.7559</td><td>124.7559</td><td>124.7559</td><td>524632 B</td>
+</tr><tr><td>GrowthArray</td><td>16385</td><td>134,222.83 ns</td><td>663.7954 ns</td><td>620.9146 ns</td><td>134,214.75 ns</td><td>41.5039</td><td>41.5039</td><td>41.5039</td><td>262800 B</td>
+</tr><tr><td>List</td><td>24576</td><td>221,584.95 ns</td><td>1,204.4482 ns</td><td>1,126.6415 ns</td><td>221,392.38 ns</td><td>124.7559</td><td>124.7559</td><td>124.7559</td><td>524632 B</td>
+</tr><tr><td>GrowthArray</td><td>24576</td><td>207,726.77 ns</td><td>1,365.9067 ns</td><td>1,277.6699 ns</td><td>207,817.88 ns</td><td>41.5039</td><td>41.5039</td><td>41.5039</td><td>262800 B</td>
+</tr><tr><td>List</td><td>25000</td><td>224,504.27 ns</td><td>1,108.3489 ns</td><td>1,036.7502 ns</td><td>224,704.02 ns</td><td>124.7559</td><td>124.7559</td><td>124.7559</td><td>524632 B</td>
+</tr><tr><td>GrowthArray</td><td>25000</td><td>212,053.94 ns</td><td>1,608.2105 ns</td><td>1,504.3209 ns</td><td>211,944.49 ns</td><td>41.5039</td><td>41.5039</td><td>41.5039</td><td>262800 B</td>
+</tr><tr><td>List</td><td>32768</td><td>257,701.82 ns</td><td>2,338.7592 ns</td><td>1,952.9697 ns</td><td>258,108.06 ns</td><td>124.5117</td><td>124.5117</td><td>124.5117</td><td>524632 B</td>
+</tr><tr><td>GrowthArray</td><td>32768</td><td>286,494.89 ns</td><td>2,517.4599 ns</td><td>2,231.6624 ns</td><td>286,523.22 ns</td><td>41.5039</td><td>41.5039</td><td>41.5039</td><td>262800 B</td>
+</tr><tr><td>List</td><td>32769</td><td>385,997.28 ns</td><td>6,138.1944 ns</td><td>5,741.6703 ns</td><td>386,597.86 ns</td><td>285.6445</td><td>285.6445</td><td>285.6445</td><td>1048944 B</td>
+</tr><tr><td>GrowthArray</td><td>32769</td><td>308,116.29 ns</td><td>3,421.3596 ns</td><td>3,200.3416 ns</td><td>307,953.37 ns</td><td>124.5117</td><td>124.5117</td><td>124.5117</td><td>524968 B</td>
+</tr><tr><td>List</td><td>49152</td><td>434,621.31 ns</td><td>8,353.8553 ns</td><td>7,814.2006 ns</td><td>432,105.63 ns</td><td>285.6445</td><td>285.6445</td><td>285.6445</td><td>1048944 B</td>
+</tr><tr><td>GrowthArray</td><td>49152</td><td>464,065.23 ns</td><td>7,686.3117 ns</td><td>7,189.7800 ns</td><td>462,200.88 ns</td><td>124.5117</td><td>124.5117</td><td>124.5117</td><td>524968 B</td>
+</tr><tr><td>List</td><td>50000</td><td>434,695.61 ns</td><td>3,051.9047 ns</td><td>2,854.7532 ns</td><td>434,726.81 ns</td><td>285.6445</td><td>285.6445</td><td>285.6445</td><td>1048944 B</td>
+</tr><tr><td>GrowthArray</td><td>50000</td><td>464,897.84 ns</td><td>5,212.4809 ns</td><td>4,620.7281 ns</td><td>463,094.78 ns</td><td>124.5117</td><td>124.5117</td><td>124.5117</td><td>524968 B</td>
+</tr></tbody></table>
+</body>
+</html>
