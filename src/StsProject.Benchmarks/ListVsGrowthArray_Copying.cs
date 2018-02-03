@@ -30,32 +30,32 @@ namespace StsProject.Benchmarks
         )]
         public int N;
 
-        public List<object> _List;
-        public GrowthArray<object> _GrowthArray;
-        public object[] _Target;
+        // long is used instead of object to circumvent type checks by the CLR.
+        // Type checks make array assignments slower.
+        public List<long> _List;
+        public GrowthArray<long> _GrowthArray;
+        public long[] _Target;
 
         [GlobalSetup]
         public void Setup()
         {
-            var obj = new object();
-
-            _List = new List<object>();
+            _List = new List<long>();
             for (int i = 0; i < N; i++)
             {
-                _List.Add(obj);
+                _List.Add(0);
             }
 
-            _GrowthArray = new GrowthArray<object>();
+            _GrowthArray = new GrowthArray<long>();
             for (int i = 0; i < N; i++)
             {
-                _GrowthArray.Append(obj);
+                _GrowthArray.Append(0);
             }
         }
 
         [IterationSetup]
         public void IterSetup()
         {
-            _Target = new object[N];
+            _Target = new long[N];
         }
 
         [Benchmark]
