@@ -10,7 +10,7 @@ namespace StsProject.Benchmarks
         static void Main(string[] args)
         {
             //BenchmarkRunner.Run<ListVsGrowthArray_Append>();
-            BenchmarkRunner.Run<ListVsGrowthArray_GetItem>();
+            //BenchmarkRunner.Run<ListVsGrowthArray_GetItem>();
         }
     }
 }

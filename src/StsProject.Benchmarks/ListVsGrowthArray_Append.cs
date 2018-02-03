@@ -7,7 +7,7 @@ using BenchmarkDotNet.Attributes.Jobs;
 namespace StsProject.Benchmarks
 {
     [CoreJob]
-    [RPlotExporter]
+    //[RPlotExporter]
     [MemoryDiagnoser] // Measure memory allocations in addition to CPU time
     public class ListVsGrowthArray_Append
     {

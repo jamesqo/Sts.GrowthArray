@@ -7,7 +7,7 @@ using BenchmarkDotNet.Attributes.Jobs;
 namespace StsProject.Benchmarks
 {
     [CoreJob]
-    [RPlotExporter]
+    //[RPlotExporter]
     public class ListVsGrowthArray_GetItem
     {
         [Params(
