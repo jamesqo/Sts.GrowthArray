@@ -167,7 +167,7 @@ run(
 run(
   type="GetItem",
   file="StsProject.Benchmarks.ListVsGrowthArray_GetItem-measurements.csv",
-  timetitle="Average Time Needed for Random Access (100 Times), Size=N",
+  timetitle="Average Time Needed for Random Access, Size=N",
   spacetitle=NULL,
   values=c("List"="red", "GrowthArray_O1"="blue", "GrowthArray_OLogN"="green"),
   labels=c("List", "GrowthArray, O(1)", "GrowthArray, O(log N)")

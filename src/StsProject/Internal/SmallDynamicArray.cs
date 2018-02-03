@@ -58,14 +58,7 @@ namespace StsProject
             _buf = newBuf;
         }
 
-        public ref T this[int index]
-        {
-            get
-            {
-                Debug.Assert(index >= 0 && index < _size);
-                return ref _buf[index];
-            }
-        }
+        public T this[int index] => _buf[index];
 
         [ExcludeFromCodeCoverage]
         private string DebuggerDisplay => $"Size = {Size}";

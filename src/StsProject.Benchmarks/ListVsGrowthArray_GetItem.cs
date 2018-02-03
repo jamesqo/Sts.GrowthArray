@@ -52,7 +52,7 @@ namespace StsProject.Benchmarks
         public void List()
         {
             var collection = _List;
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < N; i++)
             {
                 _ = collection[i];
             }
@@ -62,7 +62,7 @@ namespace StsProject.Benchmarks
         public void GrowthArray_O1()
         {
             var collection = _GrowthArray;
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < N; i++)
             {
                 _ = collection[i];
             }
@@ -72,7 +72,7 @@ namespace StsProject.Benchmarks
         public void GrowthArray_OLogN()
         {
             var collection = _GrowthArray;
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < N; i++)
             {
                 _ = collection.GetItemLogarithmic(i);
             }

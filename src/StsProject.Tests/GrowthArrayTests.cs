@@ -76,9 +76,9 @@ namespace StsProject.Tests
             for (int i = 0; i < collection.Size; i++)
             {
                 Assert.Equal(array[i], collection[i]);
-                collection[i] = newValue;
-                Assert.Equal(newValue, collection[i]);
-                collection[i] = array[i];
+                //collection[i] = newValue;
+                //Assert.Equal(newValue, collection[i]);
+                //collection[i] = array[i];
                 Assert.Equal(array[i], collection[i]);
             }
         }
@@ -94,9 +94,9 @@ namespace StsProject.Tests
             for (int i = 0; i < collection.Size; i++)
             {
                 Assert.Equal(array[i], collection.GetItemLogarithmic(i));
-                collection.GetItemLogarithmic(i) = newValue;
-                Assert.Equal(newValue, collection.GetItemLogarithmic(i));
-                collection.GetItemLogarithmic(i) = array[i];
+                //collection.GetItemLogarithmic(i) = newValue;
+                //Assert.Equal(newValue, collection.GetItemLogarithmic(i));
+                //collection.GetItemLogarithmic(i) = array[i];
                 Assert.Equal(array[i], collection.GetItemLogarithmic(i));
             }
         }

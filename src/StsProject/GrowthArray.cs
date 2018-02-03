@@ -86,51 +86,71 @@ namespace StsProject
             _capacity += newHcap;
         }
 
-        public ref T this[int index]
+        public T this[int index]
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
-                Debug.Assert(index >= 0 && index < _size);
-
-                int bufferIndex, elementIndex;
-                if (index >= InitialCapacity)
+                int bufferIndex = MathHelpers.CeilLog2(index + 1) - Log2InitialCapacity;
+                // Check within range [1, _tail.Size - 1]. Common case for large growth arrays.
+                // Since 'bufferIndex > 0' is not commonly false, use single &.
+                var tail = _tail;
+                if ((bufferIndex > 0) & (bufferIndex != tail.Size))
                 {
-                    bufferIndex = Math.Max(MathHelpers.CeilLog2(index + 1) - Log2InitialCapacity, 0);
-                    elementIndex = index - (1 << (bufferIndex + Log2InitialCapacity - 1));
+                    T[] buffer = tail[bufferIndex];
+                    int elementIndex = index - (1 << (bufferIndex + Log2InitialCapacity - 1));
+                    return buffer[elementIndex];
                 }
                 else
                 {
-                    bufferIndex = 0;
-                    elementIndex = index;
+                    return GetItemUncommon(index);
                 }
-
-                return ref GetBuffer(bufferIndex)[elementIndex];
             }
+            // set can be impl'd in a similar fashion.
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private T GetItemUncommon(int index)
+        {
+            if (index < InitialCapacity)
+            {
+                return GetBuffer(0)[index];
+            }
+
+            // bufferIndex == tail.Size, so the head is the target.
+            int elementIndex = index - (1 << (_tail.Size + Log2InitialCapacity - 1));
+            return _head[elementIndex];
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T[] GetBuffer(int bufferIndex)
         {
             Debug.Assert(bufferIndex >= 0 && bufferIndex <= _tail.Size);
 
-            return bufferIndex < _tail.Size ? _tail[bufferIndex] : _head;
+            var tail = _tail;
+            return bufferIndex < tail.Size ? tail[bufferIndex] : _head;
         }
 
-        public ref T GetItemLogarithmic(int index)
+        // SetItemLogarithmic can be done in a similar fashion.
+        public T GetItemLogarithmic(int index)
         {
             Debug.Assert(index >= 0 && index < _size);
 
             int i = index;
-            foreach (T[] buf in _tail)
+            var tail = _tail;
+
+            for (int j = 0, n = tail.Size; j < n; j++)
             {
-                if (i < buf.Length)
+                T[] buf = tail[j];
+                if ((uint)i < (uint)buf.Length)
                 {
-                    return ref buf[i];
+                    return buf[i];
                 }
                 i -= buf.Length;
             }
 
             Debug.Assert(i < _head.Length);
-            return ref _head[i];
+            return _head[i];
         }
 
         public Enumerator GetEnumerator() => new Enumerator(this);
