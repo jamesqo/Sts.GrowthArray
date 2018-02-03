@@ -32,9 +32,7 @@ ggsaveNice <- function(fileName, p, ...) {
   cat("------------------------------\n")
 }
 
-args <- commandArgs(trailingOnly = TRUE)
-files <- if (length(args) > 0) args else list.files()[list.files() %>% ends_with("-measurements.csv")]
-for (file in files) {
+run <- function(type, file, timetitle, spacetitle, values, labels) {
   title <- gsub("-measurements.csv", "", basename(file))
   measurements <- read.csv(file, sep = ",")
 
@@ -65,52 +63,111 @@ for (file in files) {
   resultStats <- result %>%
     group_by_(.dots = c("Target_Method", "Job_Id")) %>%
     summarise(se = std.error(Measurement_Value), Value = mean(Measurement_Value))
+  plotAllocs <- !is.null(spacetitle)
   
   listDf <- result %>% filter(Target_Method == "List")
   listDf$N <- sapply(listDf$Params, function(param) strtoi(gsub("N=", "", param), base = 10))
   listMeansDf <- group_by(listDf, N) %>% summarize(MeanTime=mean(Measurement_Value))
-  listAllocDf <- group_by(listDf, N) %>% summarize(AllocatedBytes=Allocated_Bytes[1])
-  
-  growthDf <- result %>% filter(Target_Method == "GrowthArray")
-  growthDf$N <- sapply(growthDf$Params, function(param) strtoi(gsub("N=", "", param), base = 10))
-  growthMeansDf <- group_by(growthDf, N) %>% summarize(MeanTime=mean(Measurement_Value))
-  growthAllocDf <- group_by(growthDf, N) %>% summarize(AllocatedBytes=Allocated_Bytes[1])
+  if (plotAllocs) {
+    listAllocDf <- group_by(listDf, N) %>% summarize(AllocatedBytes=Allocated_Bytes[1])
+  }
 
-  timelinePlot <- ggplot() +
-    ggtitle("Average Time Needed to Append N Items") +
-    theme(plot.title = element_text(hjust = 0.5)) +
-    xlab("N") +
-    ylab(paste0("Average Time (", timeUnit, ")")) +
-    scale_x_continuous(trans='log10', breaks=10^(1:10)) +
-    scale_y_continuous(trans='log10', breaks=10^(1:10)) +
-    geom_line(data=listMeansDf, aes(x=N, y=MeanTime,color="List")) +
-    geom_point(data=listMeansDf, aes(x=N, y=MeanTime,color="List")) +
-    geom_line(data=growthMeansDf, aes(x=N, y=MeanTime,color="GrowthArray")) +
-    geom_point(data=growthMeansDf, aes(x=N, y=MeanTime,color="GrowthArray")) +
-    scale_color_manual(name="Legend",
-                       values=c("List"="red", "GrowthArray"="blue"),
-                       breaks=c("List", "GrowthArray"),
-                       labels=c("List", "GrowthArray"))
+  if (type == "Append") {  
+    growthDf <- result %>% filter(Target_Method == "GrowthArray")
+    growthDf$N <- sapply(growthDf$Params, function(param) strtoi(gsub("N=", "", param), base = 10))
+    growthMeansDf <- group_by(growthDf, N) %>% summarize(MeanTime=mean(Measurement_Value))
+    if (plotAllocs) {
+      growthAllocDf <- group_by(growthDf, N) %>% summarize(AllocatedBytes=Allocated_Bytes[1])
+    }
+  } else {
+    growthDf <- result %>% filter(Target_Method == "GrowthArray_O1")
+    growthDf$N <- sapply(growthDf$Params, function(param) strtoi(gsub("N=", "", param), base = 10))
+    growthMeansDf <- group_by(growthDf, N) %>% summarize(MeanTime=mean(Measurement_Value))
+    growthDf2 <- result %>% filter(Target_Method == "GrowthArray_O1")
+    growthDf2$N <- sapply(growthDf2$Params, function(param) strtoi(gsub("N=", "", param), base = 10))
+    growthMeansDf2 <- group_by(growthDf2, N) %>% summarize(MeanTime=mean(Measurement_Value))
+  }
+
+  methods <- unique(result$Target_Method)
+  if (type == "Append") {
+    timelinePlot <- ggplot() +
+      ggtitle(timetitle) +
+      theme(plot.title = element_text(hjust = 0.5)) +
+      xlab("N") +
+      ylab(paste0("Average Time (", timeUnit, ")")) +
+      scale_x_continuous(trans='log10', breaks=10^(1:10)) +
+      scale_y_continuous(trans='log10', breaks=10^(1:10)) +
+      geom_line(data=listMeansDf, aes(x=N, y=MeanTime,color="List")) +
+      geom_point(data=listMeansDf, aes(x=N, y=MeanTime,color="List")) +
+      geom_line(data=growthMeansDf, aes(x=N, y=MeanTime,color="GrowthArray")) +
+      geom_point(data=growthMeansDf, aes(x=N, y=MeanTime,color="GrowthArray")) +
+      scale_color_manual(name="Legend",
+                        values=values,
+                        breaks=methods,
+                        labels=labels)
+  } else {
+    timelinePlot <- ggplot() +
+      ggtitle(timetitle) +
+      theme(plot.title = element_text(hjust = 0.5)) +
+      xlab("N") +
+      ylab(paste0("Average Time (", timeUnit, ")")) +
+      scale_x_continuous(trans='log10', breaks=10^(1:10)) +
+      scale_y_continuous(trans='log10', breaks=10^(1:10)) +
+      geom_line(data=listMeansDf, aes(x=N, y=MeanTime,color="List")) +
+      geom_point(data=listMeansDf, aes(x=N, y=MeanTime,color="List")) +
+      geom_line(data=growthMeansDf, aes(x=N, y=MeanTime,color="GrowthArray_O1")) +
+      geom_point(data=growthMeansDf, aes(x=N, y=MeanTime,color="GrowthArray_O1")) +
+      geom_line(data=growthMeansDf2, aes(x=N, y=MeanTime,color="GrowthArray_OLogN")) +
+      geom_point(data=growthMeansDf2, aes(x=N, y=MeanTime,color="GrowthArray_OLogN")) +
+      scale_color_manual(name="Legend",
+                        values=values,
+                        breaks=methods,
+                        labels=labels)
+  }
 
   printNice(timelinePlot)
   ggsaveNice(gsub("-measurements.csv", paste0("-timeline.png"), file), timelinePlot)
 
-  allocationsPlot <- ggplot() +
-    ggtitle("Space Needed to Append N Items") +
-    theme(plot.title = element_text(hjust = 0.5)) +
-    xlab("N") +
-    ylab("Allocated Bytes") +
-    scale_x_continuous(trans='log10', breaks=10^(1:10)) +
-    scale_y_continuous(trans='log10', breaks=10^(1:10)) +
-    geom_line(data=listAllocDf, aes(x=N, y=AllocatedBytes,color="List")) +
-    geom_point(data=listAllocDf, aes(x=N, y=AllocatedBytes,color="List")) +
-    geom_line(data=growthAllocDf, aes(x=N, y=AllocatedBytes,color="GrowthArray")) +
-    geom_point(data=growthAllocDf, aes(x=N, y=AllocatedBytes,color="GrowthArray")) +
-    scale_color_manual(name="Legend",
-                       values=c("List"="red", "GrowthArray"="blue"),
-                       breaks=c("List", "GrowthArray"),
-                       labels=c("List", "GrowthArray"))
-    
-  printNice(allocationsPlot)
-  ggsaveNice(gsub("-measurements.csv", paste0("-allocations.png"), file), allocationsPlot)
+  if (plotAllocs) {
+    allocationsPlot <- ggplot() +
+      ggtitle(spacetitle) +
+      theme(plot.title = element_text(hjust = 0.5)) +
+      xlab("N") +
+      ylab("Allocated Bytes") +
+      scale_x_continuous(trans='log10', breaks=10^(1:10)) +
+      scale_y_continuous(trans='log10', breaks=10^(1:10)) +
+      geom_line(data=listAllocDf, aes(x=N, y=AllocatedBytes,color="List")) +
+      geom_point(data=listAllocDf, aes(x=N, y=AllocatedBytes,color="List")) +
+      geom_line(data=growthAllocDf, aes(x=N, y=AllocatedBytes,color="GrowthArray")) +
+      geom_point(data=growthAllocDf, aes(x=N, y=AllocatedBytes,color="GrowthArray")) +
+      scale_color_manual(name="Legend",
+                        values=values,
+                        breaks=methods,
+                        labels=labels)
+      
+    printNice(allocationsPlot)
+    ggsaveNice(gsub("-measurements.csv", paste0("-allocations.png"), file), allocationsPlot)
+  }
 }
+
+#args <- commandArgs(trailingOnly = TRUE)
+#files <- if (length(args) > 0) args else list.files()[list.files() %>% ends_with("-measurements.csv")]
+#for (file in files) {
+#}
+
+run(
+  type="Append",
+  file="StsProject.Benchmarks.ListVsGrowthArray_Append-measurements.csv",
+  timetitle="Average Time Needed to Append N Items",
+  spacetitle="Space Needed to Append N Items",
+  values=c("List"="red", "GrowthArray"="blue"),
+  labels=c("List", "GrowthArray")
+)
+
+run(
+  type="GetItem",
+  file="StsProject.Benchmarks.ListVsGrowthArray_GetItem-measurements.csv",
+  timetitle="Average Time Needed to Append N Items",
+  values=c("List"="red", "GrowthArray_O1"="blue", "GrowthArray_OLogN"="green"),
+  labels=c("List", "GrowthArray O(1)", "GrowthArray O(log N)")
+)
