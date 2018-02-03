@@ -72,7 +72,7 @@ run <- function(type, file, timetitle, spacetitle, values, labels) {
     listAllocDf <- group_by(listDf, N) %>% summarize(AllocatedBytes=Allocated_Bytes[1])
   }
 
-  if (type == "Append") {  
+  if (type == "Append" || type == "Iteration") {  
     growthDf <- result %>% filter(Target_Method == "GrowthArray")
     growthDf$N <- sapply(growthDf$Params, function(param) strtoi(gsub("N=", "", param), base = 10))
     growthMeansDf <- group_by(growthDf, N) %>% summarize(MeanTime=mean(Measurement_Value))
@@ -89,7 +89,7 @@ run <- function(type, file, timetitle, spacetitle, values, labels) {
   }
 
   methods <- unique(result$Target_Method)
-  if (type == "Append") {
+  if (type == "Append" || type == "Iteration") {
     timelinePlot <- ggplot() +
       ggtitle(timetitle) +
       theme(plot.title = element_text(hjust = 0.5)) +
@@ -176,4 +176,13 @@ run(
   spacetitle=NULL,
   values=c("List"="red", "GrowthArray_O1"="blue", "GrowthArray_OLogN"="green"),
   labels=c("List", "GrowthArray, O(1)", "GrowthArray, O(log N)")
+)
+
+run(
+  type="Iteration",
+  file="StsProject.Benchmarks.ListVsGrowthArray_Iteration-measurements.csv",
+  timetitle="Average Time Needed for Iteration, Size=N",
+  spacetitle=NULL,
+  values=c("List"="red", "GrowthArray"="blue"),
+  labels=c("List", "GrowthArray")
 )

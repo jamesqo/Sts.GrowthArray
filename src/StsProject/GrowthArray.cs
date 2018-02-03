@@ -173,16 +173,18 @@ namespace StsProject
 
         public void CopyTo(T[] array, int arrayIndex)
         {
-            Debug.Assert(array != null);
-            Debug.Assert(arrayIndex >= 0 && array.Length - arrayIndex >= _size);
-
-            foreach (T[] buf in _tail)
+            var tail = _tail;
+            for (int i = 0, n = tail.Size; i < n; i++)
             {
-                Array.Copy(buf, 0, array, arrayIndex, buf.Length);
-                arrayIndex += buf.Length;
+                T[] buf = tail[i];
+                int buflen = buf.Length;
+
+                Array.Copy(buf, 0, array, arrayIndex, buflen);
+                arrayIndex += buflen;
             }
 
-            Array.Copy(_head, 0, array, arrayIndex, HeadSize);
+            var head = _head;
+            Array.Copy(head, 0, array, arrayIndex, head.Length);
         }
 
         [ExcludeFromCodeCoverage]

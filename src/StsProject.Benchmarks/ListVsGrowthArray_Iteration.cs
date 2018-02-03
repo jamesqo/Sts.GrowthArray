@@ -9,14 +9,14 @@ namespace StsProject.Benchmarks
     [CoreJob]
     //[RPlotExporter]
     [CsvMeasurementsExporter]
-    public class ListVsGrowthArray_GetItem
+    public class ListVsGrowthArray_Iteration
     {
         [Params(
-            4,       // 1 buf (since c0 = 8)
-            8,       // 1 buf (since c0 = 8)
-            16,      // 2 bufs
-            32,      // 3 bufs
-            64,      // ...
+            4,
+            8,
+            16,
+            32,
+            64,
             128,
             256,
             512,
@@ -53,29 +53,17 @@ namespace StsProject.Benchmarks
         public void List()
         {
             var collection = _List;
-            for (int i = 0; i < N; i++)
+            foreach (var item in collection)
             {
-                _ = collection[i];
             }
         }
 
         [Benchmark]
-        public void GrowthArray_O1()
+        public void GrowthArray()
         {
             var collection = _GrowthArray;
-            for (int i = 0; i < N; i++)
+            foreach (var item in collection)
             {
-                _ = collection[i];
-            }
-        }
-
-        [Benchmark]
-        public void GrowthArray_OLogN()
-        {
-            var collection = _GrowthArray;
-            for (int i = 0; i < N; i++)
-            {
-                _ = collection.GetItemLogarithmic(i);
             }
         }
     }

@@ -8,6 +8,7 @@ namespace StsProject.Benchmarks
 {
     [CoreJob]
     //[RPlotExporter]
+    [CsvMeasurementsExporter]
     [MemoryDiagnoser] // Measure memory allocations in addition to CPU time
     public class ListVsGrowthArray_Append
     {
