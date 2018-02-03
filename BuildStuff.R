@@ -72,7 +72,7 @@ run <- function(type, file, timetitle, spacetitle, values, labels) {
     listAllocDf <- group_by(listDf, N) %>% summarize(AllocatedBytes=Allocated_Bytes[1])
   }
 
-  if (type == "Append" || type == "Iteration") {  
+  if (type == "Append" || type == "Iteration" || type == "Copying") {  
     growthDf <- result %>% filter(Target_Method == "GrowthArray")
     growthDf$N <- sapply(growthDf$Params, function(param) strtoi(gsub("N=", "", param), base = 10))
     growthMeansDf <- group_by(growthDf, N) %>% summarize(MeanTime=mean(Measurement_Value))
@@ -89,7 +89,7 @@ run <- function(type, file, timetitle, spacetitle, values, labels) {
   }
 
   methods <- unique(result$Target_Method)
-  if (type == "Append" || type == "Iteration") {
+  if (type == "Append" || type == "Iteration" || type == "Copying") {
     timelinePlot <- ggplot() +
       ggtitle(timetitle) +
       theme(plot.title = element_text(hjust = 0.5)) +
@@ -181,7 +181,16 @@ run(
 run(
   type="Iteration",
   file="StsProject.Benchmarks.ListVsGrowthArray_Iteration-measurements.csv",
-  timetitle="Average Time Needed for Iteration, Size=N",
+  timetitle="Average Time Needed to Iterate N Items",
+  spacetitle=NULL,
+  values=c("List"="red", "GrowthArray"="blue"),
+  labels=c("List", "GrowthArray")
+)
+
+run(
+  type="Copying",
+  file="StsProject.Benchmarks.ListVsGrowthArray_Copying-measurements.csv",
+  timetitle="Average Time Needed to Copy N Items",
   spacetitle=NULL,
   values=c("List"="red", "GrowthArray"="blue"),
   labels=c("List", "GrowthArray")

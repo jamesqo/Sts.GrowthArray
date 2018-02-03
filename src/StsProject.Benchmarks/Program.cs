@@ -11,7 +11,8 @@ namespace StsProject.Benchmarks
         {
             //BenchmarkRunner.Run<ListVsGrowthArray_Append>();
             //BenchmarkRunner.Run<ListVsGrowthArray_GetItem>();
-            BenchmarkRunner.Run<ListVsGrowthArray_Iteration>();
+            //BenchmarkRunner.Run<ListVsGrowthArray_Iteration>();
+            BenchmarkRunner.Run<ListVsGrowthArray_Copying>();
         }
     }
 }
