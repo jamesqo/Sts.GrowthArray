@@ -11,11 +11,11 @@ namespace StsProject.Benchmarks
     public class ListVsGrowthArray_GetItem
     {
         [Params(
-            4,     // 1 buf (since c0 = 8)
-            8,     // 1 buf (since c0 = 8)
-            16,    // 2 bufs
-            32,    // 3 bufs
-            64,    // ...
+            4,       // 1 buf (since c0 = 8)
+            8,       // 1 buf (since c0 = 8)
+            16,      // 2 bufs
+            32,      // 3 bufs
+            64,      // ...
             128,
             256,
             512,
@@ -23,7 +23,9 @@ namespace StsProject.Benchmarks
             2048,
             4096,
             8192,
-            16384
+            16384,
+            32768,
+            65536
         )]
         public int N;
 
