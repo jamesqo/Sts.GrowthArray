@@ -69,7 +69,11 @@ for (file in files) {
   plotAllocs <- "Allocated_Bytes" %in% result
   colors <- c("red", "blue", "green", "orange")
   methods <- unique(result$Target_Method)
-  values <- mapply(function(method, color) method=color, methods, colors)
+  values <- colors[1:length(methods)]
+  names(values) <- methods
+  #print(values)
+  #print(methods)
+  #print(colors)
 
   timelinePlot <- ggplot() +
     ggtitle("Average Time Needed to Append N Items") +
@@ -95,6 +99,9 @@ for (file in files) {
       geom_line(data=meansDf, aes(x=N, y=MeanTime,color=method)) +
       geom_point(data=meansDf, aes(x=N, y=MeanTime,color=method))
   }
+
+  printNice(timelinePlot)
+  ggsaveNice(gsub("-measurements.csv", paste0("-timeline.png"), file), timelinePlot)
 
   if (FALSE) {
   timelinePlot <- ggplot() +
