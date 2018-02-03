@@ -83,7 +83,7 @@ run <- function(type, file, timetitle, spacetitle, values, labels) {
     growthDf <- result %>% filter(Target_Method == "GrowthArray_O1")
     growthDf$N <- sapply(growthDf$Params, function(param) strtoi(gsub("N=", "", param), base = 10))
     growthMeansDf <- group_by(growthDf, N) %>% summarize(MeanTime=mean(Measurement_Value))
-    growthDf2 <- result %>% filter(Target_Method == "GrowthArray_O1")
+    growthDf2 <- result %>% filter(Target_Method == "GrowthArray_OLogN")
     growthDf2$N <- sapply(growthDf2$Params, function(param) strtoi(gsub("N=", "", param), base = 10))
     growthMeansDf2 <- group_by(growthDf2, N) %>% summarize(MeanTime=mean(Measurement_Value))
   }
@@ -167,7 +167,8 @@ run(
 run(
   type="GetItem",
   file="StsProject.Benchmarks.ListVsGrowthArray_GetItem-measurements.csv",
-  timetitle="Average Time Needed to Append N Items",
+  timetitle="Average Time Needed for Random Access (100 Times), Size=N",
+  spacetitle=NULL,
   values=c("List"="red", "GrowthArray_O1"="blue", "GrowthArray_OLogN"="green"),
-  labels=c("List", "GrowthArray O(1)", "GrowthArray O(log N)")
+  labels=c("List", "GrowthArray, O(1)", "GrowthArray, O(log N)")
 )
