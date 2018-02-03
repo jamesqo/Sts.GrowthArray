@@ -106,6 +106,11 @@ run <- function(type, file, timetitle, spacetitle, values, labels) {
                         breaks=methods,
                         labels=labels)
   } else {
+    # We want to get the average time for 1 random access, not N of them
+    listMeansDf$MeanTime <- listMeansDf$MeanTime / listMeansDf$N
+    growthMeansDf$MeanTime <- growthMeansDf$MeanTime / growthMeansDf$N
+    growthMeansDf2$MeanTime <- growthMeansDf2$MeanTime / growthMeansDf2$N
+
     timelinePlot <- ggplot() +
       ggtitle(timetitle) +
       theme(plot.title = element_text(hjust = 0.5)) +
