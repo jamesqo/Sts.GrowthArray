@@ -292,3 +292,7 @@ results.xml
 
 # ReportGenerator directory
 /reports/
+
+# BenchmarkDotNet plots
+*.png
+*.pdf

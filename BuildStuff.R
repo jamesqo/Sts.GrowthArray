@@ -65,18 +65,11 @@ for (file in files) {
   resultStats <- result %>%
     group_by_(.dots = c("Target_Method", "Job_Id")) %>%
     summarise(se = std.error(Measurement_Value), Value = mean(Measurement_Value))
-
-  listDf <- result %>% filter(Target_Method == "List")
-  listDf$N <- sapply(listDf$Params, function(param) strtoi(gsub("N=", "", param), base = 10))
-  listMeansDf <- group_by(listDf, N) %>% summarize(MeanTime=mean(Measurement_Value))
-  listAllocDf <- group_by(listDf, N) %>% summarize(AllocatedBytes=Allocated_Bytes[1])
-  #print(listAllocDf)
   
-  growthDf <- result %>% filter(Target_Method == "GrowthArray")
-  growthDf$N <- sapply(growthDf$Params, function(param) strtoi(gsub("N=", "", param), base = 10))
-  growthMeansDf <- group_by(growthDf, N) %>% summarize(MeanTime=mean(Measurement_Value))
-  growthAllocDf <- group_by(growthDf, N) %>% summarize(AllocatedBytes=Allocated_Bytes[1])
-  #print(growthAllocDf)
+  plotAllocs <- "Allocated_Bytes" %in% result
+  colors <- c("red", "blue", "green", "orange")
+  methods <- unique(result$Target_Method)
+  values <- mapply(function(method, color) method=color, methods, colors)
 
   timelinePlot <- ggplot() +
     ggtitle("Average Time Needed to Append N Items") +
@@ -85,8 +78,32 @@ for (file in files) {
     ylab(paste0("Average Time (", timeUnit, ")")) +
     scale_x_continuous(trans='log10', breaks=10^(1:10)) +
     scale_y_continuous(trans='log10', breaks=10^(1:10)) +
-    geom_line(data=listMeansDf, aes(x=N, y=MeanTime,color="List")) +
-    geom_point(data=listMeansDf, aes(x=N, y=MeanTime,color="List")) +
+    scale_color_manual(name="Legend",
+                       values=values,
+                       breaks=methods,
+                       labels=methods)
+
+  for (method in methods) {
+    df <- result %>% filter(Target_Method == method)
+    df$N <- sapply(df$Params, function(param) strtoi(gsub("N=", "", param), base = 10))
+    meansDf <- group_by(df, N) %>% summarize(MeanTime=mean(Measurement_Value))
+    if (plotAllocs) {
+      allocDf <- group_by(df, N) %>% summarize(AllocatedBytes=Allocated_Bytes[1])
+    }
+
+    timelinePlot <- timelinePlot +
+      geom_line(data=meansDf, aes(x=N, y=MeanTime,color=method)) +
+      geom_point(data=meansDf, aes(x=N, y=MeanTime,color=method))
+  }
+
+  if (FALSE) {
+  timelinePlot <- ggplot() +
+    ggtitle("Average Time Needed to Append N Items") +
+    theme(plot.title = element_text(hjust = 0.5)) +
+    xlab("N") +
+    ylab(paste0("Average Time (", timeUnit, ")")) +
+    scale_x_continuous(trans='log10', breaks=10^(1:10)) +
+    scale_y_continuous(trans='log10', breaks=10^(1:10)) +
     geom_line(data=growthMeansDf, aes(x=N, y=MeanTime,color="GrowthArray")) +
     geom_point(data=growthMeansDf, aes(x=N, y=MeanTime,color="GrowthArray")) +
     scale_color_manual(name="Legend",
@@ -115,4 +132,5 @@ for (file in files) {
     
   printNice(allocationsPlot)
   ggsaveNice(gsub("-measurements.csv", paste0("-allocations.png"), file), allocationsPlot)
+  }
 }
