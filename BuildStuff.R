@@ -95,8 +95,8 @@ run <- function(type, file, timetitle, spacetitle, values, labels) {
       theme(plot.title = element_text(hjust = 0.5)) +
       xlab("N") +
       ylab(paste0("Average Time (", timeUnit, ")")) +
-      scale_x_continuous(trans='log10', breaks=10^(1:10)) +
-      scale_y_continuous(trans='log10', breaks=10^(1:10)) +
+      scale_x_continuous(trans='log2', breaks=10^(1:10)) +
+      scale_y_continuous(trans='log2', breaks=10^(1:10)) +
       geom_line(data=listMeansDf, aes(x=N, y=MeanTime,color="List")) +
       geom_point(data=listMeansDf, aes(x=N, y=MeanTime,color="List")) +
       geom_line(data=growthMeansDf, aes(x=N, y=MeanTime,color="GrowthArray")) +
@@ -116,8 +116,8 @@ run <- function(type, file, timetitle, spacetitle, values, labels) {
       theme(plot.title = element_text(hjust = 0.5)) +
       xlab("N") +
       ylab(paste0("Average Time (", timeUnit, ")")) +
-      scale_x_continuous(trans='log10', breaks=10^(1:10)) +
-      scale_y_continuous(trans='log10', breaks=10^(1:10)) +
+      scale_x_continuous(trans='log2', breaks=10^(1:10)) +
+      scale_y_continuous(trans='log2', breaks=10^(1:10)) +
       geom_line(data=listMeansDf, aes(x=N, y=MeanTime,color="List")) +
       geom_point(data=listMeansDf, aes(x=N, y=MeanTime,color="List")) +
       geom_line(data=growthMeansDf, aes(x=N, y=MeanTime,color="GrowthArray_O1")) +
@@ -139,8 +139,8 @@ run <- function(type, file, timetitle, spacetitle, values, labels) {
       theme(plot.title = element_text(hjust = 0.5)) +
       xlab("N") +
       ylab("Allocated Bytes") +
-      scale_x_continuous(trans='log10', breaks=10^(1:10)) +
-      scale_y_continuous(trans='log10', breaks=10^(1:10)) +
+      scale_x_continuous(trans='log2', breaks=10^(1:10)) +
+      scale_y_continuous(trans='log2', breaks=10^(1:10)) +
       geom_line(data=listAllocDf, aes(x=N, y=AllocatedBytes,color="List")) +
       geom_point(data=listAllocDf, aes(x=N, y=AllocatedBytes,color="List")) +
       geom_line(data=growthAllocDf, aes(x=N, y=AllocatedBytes,color="GrowthArray")) +
@@ -160,6 +160,8 @@ run <- function(type, file, timetitle, spacetitle, values, labels) {
 #for (file in files) {
 #}
 
+theme_set(theme_gray(base_size=15))
+
 run(
   type="Append",
   file="StsProject.Benchmarks.ListVsGrowthArray_Append-measurements.csv",
@@ -172,7 +174,7 @@ run(
 run(
   type="GetItem",
   file="StsProject.Benchmarks.ListVsGrowthArray_GetItem-measurements.csv",
-  timetitle="Average Time Needed for Random Access, Size=N",
+  timetitle="Average Time Needed for 1 Random Access",
   spacetitle=NULL,
   values=c("List"="red", "GrowthArray_O1"="blue", "GrowthArray_OLogN"="green"),
   labels=c("List", "GrowthArray, O(1)", "GrowthArray, O(log N)")
